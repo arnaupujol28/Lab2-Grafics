@@ -9,6 +9,8 @@
 #include "camera.h"
 #include "mesh.h"
 
+//cal posar Drawline, scanline, drawtriangle
+
 Image::Image() {
 	width = 0; height = 0;
 	pixels = NULL;
