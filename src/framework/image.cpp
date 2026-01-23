@@ -10,6 +10,7 @@
 #include "mesh.h"
 
 //cal posar Drawline, scanline, drawtriangle
+//prova 2
 
 Image::Image() {
 	width = 0; height = 0;
