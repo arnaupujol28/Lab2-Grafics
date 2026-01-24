@@ -1,10 +1,9 @@
-#include "application.h"
 #include "mesh.h"
-#include "shader.h"
-#include "utils.h" 
+#include "framework.h"
+#include "entity.h"
 
-/*Entity::Entity()
+Entity::Entity() // constructor, ho inicialitza buit i despres ja es posa el que calgui
 {
     mesh = nullptr;
     model.SetIdentity();
-}*/
+}

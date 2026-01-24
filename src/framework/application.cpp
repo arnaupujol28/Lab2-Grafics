@@ -27,7 +27,14 @@ Application::~Application()
 void Application::Init(void)
 {
 	std::cout << "Initiating app..." << std::endl;
-	//entity = new Entity(); 
+	
+	Mesh* mesh = new Mesh();
+	mesh->LoadOBJ("meshes/lee.obj");
+	
+	Entity* entity = new Entity(); 
+	entity->mesh = mesh; // He fet els atributs publics enlloc de fer servir getters
+
+	entity->model.MakeTranslationMatrix(0,0,-5); // matriu model mou en l eix z
 
 	
 

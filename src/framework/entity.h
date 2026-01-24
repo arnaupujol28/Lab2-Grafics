@@ -4,10 +4,10 @@
 class Entity {
 	
 	public:
-	Entity(Mesh mesh, Matrix44 model);
-	~Entity();
-	private:
+	Entity(); // signatura constructor
 
-	Mesh mesh;
+
+	//atributs
+	Mesh* mesh; 
 	Matrix44 model;
 };
