@@ -11,7 +11,7 @@
 
 //cal posar Drawline, scanline, drawtriangle
 //prova 2
-
+//prova joana
 Image::Image() {
 	width = 0; height = 0;
 	pixels = NULL;
