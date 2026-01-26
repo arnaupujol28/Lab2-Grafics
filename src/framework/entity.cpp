@@ -4,6 +4,55 @@
 
 Entity::Entity() // constructor, ho inicialitza buit i despres ja es posa el que calgui
 {
-    mesh = nullptr;
-    model.SetIdentity();
+    this->mesh = nullptr;
+    this->model.SetIdentity();
+}
+
+void Entity::Render(Image* framebuffer, Camera* camera, const Color& c)
+{
+    
+    const std::vector<Vector3>& vertexs = mesh->vertexs; //obtenim els vertexs de la malla
+
+   
+    for (int i = 0; i < vertexs.size(); i += 3) {//iterem sobre els vertexs de 3 en 3 perq es un triangle
+
+        //vertexs en l'espai local
+        Vector3 v1 = vertexs[i];
+        Vector3 v2 = vertexs[i + 1];
+        Vector3 v3 = vertexs[i + 2];
+
+        //transformem de local a mon
+        // per ferho multipliquem paer la matriu model de la entitat
+        Vector3 w1 = model * v1;
+        Vector3 w2 = model * v2;
+        Vector3 w3 = model * v3;
+
+        // Projectem a clip space
+        //utilitzem funcion de la camara
+        Vector3 p1 = camera->ProjectVector(w1);
+        Vector3 p2 = camera->ProjectVector(w2);
+        Vector3 p3 = camera->ProjectVector(w3);
+
+        // CLIPPING 
+        // nomes renderitzem si esta dins del rang [-1,1}
+        // per ferho comprovem q els 3 punts estan a dins
+        if (p1.x < -1 || p1.x > 1 || p1.y < -1 || p1.y > 1 || p1.z < -1 || p1.z > 1) continue;
+        if (p2.x < -1 || p2.x > 1 || p2.y < -1 || p2.y > 1 || p2.z < -1 || p2.z > 1) continue;
+        if (p3.x < -1 || p3.x > 1 || p3.y < -1 || p3.y > 1 || p3.z < -1 || p3.z > 1) continue;
+
+        // clip space a screen space
+        // Convertim el rang [-1, 1] a [0, width-1] i [0, height-1]
+        float w = (float)framebuffer->width;
+        float h = (float)framebuffer->height;
+
+        // Formula: (coordenada + 1) * 0.5 * tamany
+        Vector2 s1((p1.x + 1.0f) * 0.5f * (w - 1.0f), (p1.y + 1.0f) * 0.5f * (h - 1.0f));
+        Vector2 s2((p2.x + 1.0f) * 0.5f * (w - 1.0f), (p2.y + 1.0f) * 0.5f * (h - 1.0f));
+        Vector2 s3((p3.x + 1.0f) * 0.5f * (w - 1.0f), (p3.y + 1.0f) * 0.5f * (h - 1.0f));
+
+        //Dibuixem les linies utilitzan el nostre algoritme DDA
+        framebuffer->DrawLineDDA(s1.x, s1.y, s2.x, s2.y, c);
+        framebuffer->DrawLineDDA(s2.x, s2.y, s3.x, s3.y, c);
+        framebuffer->DrawLineDDA(s3.x, s3.y, s1.x, s1.y, c);
+    }
 }

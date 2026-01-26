@@ -29,8 +29,8 @@ void Application::Init(void)
 	std::cout << "Initiating app..." << std::endl;
 	
 	Mesh* mesh = new Mesh();
-	mesh->LoadOBJ("meshes/lee.obj");
-	
+	mesh->LoadOBJ("meshes/lee.obj"); //carrega arxiu especificat
+
 	Entity* entity = new Entity(); 
 	entity->mesh = mesh; // He fet els atributs publics enlloc de fer servir getters
 
