@@ -8,6 +8,9 @@
 #include "utils.h"
 #include "camera.h"
 #include "mesh.h"
+#include <cmath> // std::round
+#include <algorithm> // std::max
+
 
 //cal posar Drawline, scanline, drawtriangle
 //prova 2hbhvb
@@ -405,4 +408,32 @@ void FloatImage::Resize(unsigned int width, unsigned int height)
 	this->width = width;
 	this->height = height;
 	pixels = new_pixels;
+}
+
+void Image::DrawLineDDA(float x0, float y0, float x1, float y1, const Color& c) {
+
+	// resta
+	float dx = x1 - x0;
+	float dy = y1 - y0;
+
+	//passos
+	int steps = (int)std::max(std::fabs(dx), std::fabs(dy));
+
+	// increment per pas
+	float xInc = dx / (float)steps;
+	float yInc = dy / (float)steps;
+
+	float x = x0;
+	float y = y0;
+
+	for (int i = 0; i <= steps; ++i)
+	{
+		int xi = (int)std::round(x);
+		int yi = (int)std::round(y);
+
+		this->SetPixel(xi, yi, c);
+
+		x += xInc;
+		y += yInc;
+	}
 }

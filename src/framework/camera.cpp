@@ -80,17 +80,51 @@ void Camera::LookAt(const Vector3& eye, const Vector3& center, const Vector3& up
 	UpdateViewMatrix();
 }
 
-void Camera::UpdateViewMatrix()
+void Camera::UpdateViewMatrix()// R eix x de la camara. Forward direccio on mira la cam. U és l'up vector aproximadament ortogonal
 {
 	// Reset Matrix (Identity)
 	view_matrix.SetIdentity();
 
 	// Comment this line to create your own projection matrix!
-	SetExampleViewMatrix();
+	//SetExampleViewMatrix();
+
+	view_matrix.SetIdentity();
+
+	Vector3 F = center - eye;   // forward
+	F.Normalize();
+
+	Vector3 R = F.Cross(up);    // right
+	R.Normalize();
+
+	Vector3 U = R.Cross(F);     // up corregit
 
 	// Remember how to fill a Matrix4x4 (check framework slides)
 	// Careful with the order of matrix multiplications, and be sure to use normalized vectors!
 	
+	// Columna 0 = R
+	view_matrix.M[0][0] = R.x;
+	view_matrix.M[0][1] = R.y;
+	view_matrix.M[0][2] = R.z;
+	view_matrix.M[0][3] = -R.Dot(eye);
+
+	// Columna 1 = U
+	view_matrix.M[1][0] = U.x;
+	view_matrix.M[1][1] = U.y;
+	view_matrix.M[1][2] = U.z;
+	view_matrix.M[1][3] = -U.Dot(eye);
+
+	// Columna 2 = -F
+	view_matrix.M[2][0] = -F.x;
+	view_matrix.M[2][1] = -F.y;
+	view_matrix.M[2][2] = -F.z;
+	view_matrix.M[2][3] = F.Dot(eye);
+
+	// Columna 3 = (0,0,0,1)
+	view_matrix.M[3][0] = 0.0f;
+	view_matrix.M[3][1] = 0.0f;
+	view_matrix.M[3][2] = 0.0f;
+	view_matrix.M[3][3] = 1.0f;
+
 	// Create the view matrix rotation
 	// ...
 	// view_matrix.M[3][3] = 1.0;
@@ -102,22 +136,49 @@ void Camera::UpdateViewMatrix()
 }
 
 // Create a projection matrix
-void Camera::UpdateProjectionMatrix()
+void Camera::UpdateProjectionMatrix() 
 {
 	// Reset Matrix (Identity)
 	projection_matrix.SetIdentity();
 
 	// Comment this line to create your own projection matrix!
-	SetExampleProjectionMatrix();
+	//SetExampleProjectionMatrix();
 
 	// Remember how to fill a Matrix4x4 (check framework slides)
 	
 	if (type == PERSPECTIVE) {
 		// projection_matrix.M[2][3] = -1;
-		// ...
+
+		float f = 1.0f / tanf(fov * 0.5f); // fov en radians
+		float n = near_plane;
+		float fa = far_plane;
+
+		projection_matrix.Clear();//tot a 0 per claredat
+
+		projection_matrix.M[0][0] = f / aspect;
+		projection_matrix.M[1][1] = f;
+
+		projection_matrix.M[2][2] = (fa + n) / (n - fa);
+		projection_matrix.M[2][3] = (2.0f * fa * n) / (n - fa);
+
+		projection_matrix.M[3][2] = -1.0f;
+		projection_matrix.M[3][3] = 0.0f;
 	}
 	else if (type == ORTHOGRAPHIC) {
 		// ...
+		float l = left, r = right, t = top, b = bottom;
+		float n = near_plane, fa = far_plane;
+
+		projection_matrix.Clear();
+
+		projection_matrix.M[0][0] = 2.0f / (r - l);
+		projection_matrix.M[1][1] = 2.0f / (t - b);
+		projection_matrix.M[2][2] = -2.0f / (fa - n);
+		projection_matrix.M[3][3] = 1.0f;
+
+		projection_matrix.M[3][0] = -(r + l) / (r - l);
+		projection_matrix.M[3][1] = -(t + b) / (t - b);
+		projection_matrix.M[3][2] = -(fa + n) / (fa - n);
 	} 
 
 	UpdateViewProjectionMatrix();

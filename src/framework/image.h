@@ -62,6 +62,9 @@ public:
 	void SetPixel(unsigned int x, unsigned int y, const Color& c) { if(x < 0 || x > width-1) return; if(y < 0 || y > height-1) return; pixels[ y * width + x ] = c; }
 	inline void SetPixelUnsafe(unsigned int x, unsigned int y, const Color& c) { pixels[ y * width + x ] = c; }
 
+	//Dibuixar linia
+	void Image::DrawLineDDA(float x0, float y0, float x1, float y1, const Color& c);
+
 	void Resize(unsigned int width, unsigned int height);
 	void Scale(unsigned int width, unsigned int height);
 	
@@ -123,4 +126,6 @@ public:
 	inline void SetPixelUnsafe(unsigned int x, unsigned int y, const float& v) { pixels[y * width + x] = v; }
 
 	void Resize(unsigned int width, unsigned int height);
+
+	
 };

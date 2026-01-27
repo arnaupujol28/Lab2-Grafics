@@ -1,6 +1,7 @@
 #include "mesh.h"
 #include "framework.h"
 #include "entity.h"
+#include "image.h"
 
 Entity::Entity() // constructor, ho inicialitza buit i despres ja es posa el que calgui
 {
@@ -11,7 +12,7 @@ Entity::Entity() // constructor, ho inicialitza buit i despres ja es posa el que
 void Entity::Render(Image* framebuffer, Camera* camera, const Color& c)
 {
     
-    const std::vector<Vector3>& vertexs = mesh->vertexs; //obtenim els vertexs de la malla
+    const std::vector<Vector3>& vertexs = mesh->GetVertices(); //obtenim els vertexs de la malla
 
    
     for (int i = 0; i < vertexs.size(); i += 3) {//iterem sobre els vertexs de 3 en 3 perq es un triangle

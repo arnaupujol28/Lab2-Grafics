@@ -13,6 +13,9 @@ class Application
 {
 public:
 
+	Entity* scene_entity;
+	Camera* camera;
+
 	// Window
 
 	SDL_Window* window = nullptr;

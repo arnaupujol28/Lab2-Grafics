@@ -3,6 +3,7 @@
 #include "shader.h"
 #include "utils.h" 
 #include "entity.h"
+#include "camera.h"
 
 Application::Application(const char* caption, int width, int height)
 {
@@ -31,12 +32,13 @@ void Application::Init(void)
 	Mesh* mesh = new Mesh();
 	mesh->LoadOBJ("meshes/lee.obj"); //carrega arxiu especificat
 
-	Entity* entity = new Entity(); 
-	entity->mesh = mesh; // He fet els atributs publics enlloc de fer servir getters
+	this->scene_entity = new Entity(); 
+	this->scene_entity->mesh = mesh; // He fet els atributs publics enlloc de fer servir getters
 
-	entity->model.MakeTranslationMatrix(0,0,-5); // matriu model mou en l eix z
+	this->scene_entity->model.MakeTranslationMatrix(0,0,-5); // matriu model mou en l eix z
 
-	
+	//camera
+	this->camera = new Camera();
 
 
 }
@@ -44,7 +46,9 @@ void Application::Init(void)
 // Render one frame
 void Application::Render(void)
 {
-	// ...
+	if (scene_entity && camera) {
+		scene_entity->Render(&framebuffer, camera, Color(255, 255, 255));
+	}
 
 	framebuffer.Render();
 }
@@ -94,3 +98,4 @@ void Application::OnFileChanged(const char* filename)
 { 
 	Shader::ReloadSingleShader(filename);
 }
+
