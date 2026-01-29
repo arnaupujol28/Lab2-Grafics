@@ -6,7 +6,7 @@
 Camera::Camera()
 {
 	view_matrix.SetIdentity();
-	SetOrthographic(-1,1,1,-1,-1,1);
+	SetOrthographic(-1,1,1,-1,-10,10);
 }
 
 Vector3 Camera::GetLocalVector(const Vector3& v)
@@ -20,12 +20,12 @@ Vector3 Camera::GetLocalVector(const Vector3& v)
 
 Vector3 Camera::ProjectVector(Vector3 pos)
 {
-	Vector4 pos4 = Vector4(pos.x, pos.y, pos.z, 1.0);
-	Vector4 result = viewprojection_matrix * pos4;
+	Vector4 pos4 = Vector4(pos.x, pos.y, pos.z, 1.0); // passar a coords homogenies
+	Vector4 result = viewprojection_matrix * pos4; // world to clip
 	if (type == ORTHOGRAPHIC)
 		return result.GetVector3();
 	else
-		return result.GetVector3() / result.w;
+		return result.GetVector3() / result.w; // dividir per w crea l'efecte de perspectiva
 }
 
 void Camera::Rotate(float angle, const Vector3& axis)
@@ -79,8 +79,10 @@ void Camera::LookAt(const Vector3& eye, const Vector3& center, const Vector3& up
 
 	UpdateViewMatrix();
 }
-
-void Camera::UpdateViewMatrix()// R eix x de la camara. Forward direccio on mira la cam. U és l'up vector aproximadament ortogonal
+/* construir la view matrix(mon--> camara, viewing transformation) la classe camara te els seus atributs, aqui es fan servir i es modifica la viewmatrix
+* La view matrix es |R U -F T|
+					|0 0  0 1| pero amb la manera de matrix44 canviem el vector T com a ultima fila i la coord homogenia com a ultima columna*/
+void Camera::UpdateViewMatrix()// R eix x de la camara. Forward direccio on mira la cam(-z). U és l'up vector aproximadament ortogonal
 {
 	// Reset Matrix (Identity)
 	view_matrix.SetIdentity();
@@ -90,13 +92,13 @@ void Camera::UpdateViewMatrix()// R eix x de la camara. Forward direccio on mira
 
 	view_matrix.SetIdentity();
 
-	Vector3 F = center - eye;   // forward
+	Vector3 F = center - eye;   // el vector forward(vector de la camara al punt on mira) es el centre(punt on mira) - eye(punt en el que esta) 
 	F.Normalize();
 
-	Vector3 R = F.Cross(up);    // right
+	Vector3 R = F.Cross(up);    // right = F x U
 	R.Normalize();
 
-	Vector3 U = R.Cross(F);     // up corregit
+	Vector3 U = R.Cross(F);     // up corregit = R X U
 
 	// Remember how to fill a Matrix4x4 (check framework slides)
 	// Careful with the order of matrix multiplications, and be sure to use normalized vectors!
@@ -125,17 +127,15 @@ void Camera::UpdateViewMatrix()// R eix x de la camara. Forward direccio on mira
 	view_matrix.M[3][2] = 0.0f;
 	view_matrix.M[3][3] = 1.0f;
 
-	// Create the view matrix rotation
-	// ...
-	// view_matrix.M[3][3] = 1.0;
-
-	// Translate view matrix
-	// ...
+	/* ho he fet directament enlloc de fer View matrix = R^-1 * T^-1 on R^-1 = Rx Ry Rz 0  i T^-1 = 1 0 0 -EYEx
+	*																		   Ux Uy Uz 0           0 1 0 -EYEy
+	*																		   Fx Fy Fz 0	        0 0 1 -EYEz
+																			   0  0  0  1           0 0 0  1     */
 
 	UpdateViewProjectionMatrix();
 }
 
-// Create a projection matrix
+// Create a projection matrix(camara/view a view volume/clip space?)
 void Camera::UpdateProjectionMatrix() 
 {
 	// Reset Matrix (Identity)
@@ -147,15 +147,15 @@ void Camera::UpdateProjectionMatrix()
 	// Remember how to fill a Matrix4x4 (check framework slides)
 	
 	if (type == PERSPECTIVE) {
-		// projection_matrix.M[2][3] = -1;
-
+		
 		float f = 1.0f / tanf(fov * 0.5f); // fov en radians
 		float n = near_plane;
 		float fa = far_plane;
 
 		projection_matrix.Clear();//tot a 0 per claredat
 
-		projection_matrix.M[0][0] = f / aspect;
+		//pg 27 presentacio
+		projection_matrix.M[0][0] = f / aspect; // aspect = w/h
 		projection_matrix.M[1][1] = f;
 
 		projection_matrix.M[2][2] = (fa + n) / (n - fa);
@@ -171,6 +171,7 @@ void Camera::UpdateProjectionMatrix()
 
 		projection_matrix.Clear();
 
+		//pg 25
 		projection_matrix.M[0][0] = 2.0f / (r - l);
 		projection_matrix.M[1][1] = 2.0f / (t - b);
 		projection_matrix.M[2][2] = -2.0f / (fa - n);
@@ -186,7 +187,7 @@ void Camera::UpdateProjectionMatrix()
 
 void Camera::UpdateViewProjectionMatrix()
 {
-	viewprojection_matrix = projection_matrix * view_matrix;
+	viewprojection_matrix = projection_matrix * view_matrix; // world to clip(view to clip * wolrd to view)
 }
 
 Matrix44 Camera::GetViewProjectionMatrix()

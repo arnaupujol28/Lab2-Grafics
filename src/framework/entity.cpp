@@ -7,6 +7,7 @@ Entity::Entity() // constructor, ho inicialitza buit i despres ja es posa el que
 {
     this->mesh = nullptr;
     this->model.SetIdentity();
+    this->type = 0;
 }
 
 void Entity::Render(Image* framebuffer, Camera* camera, const Color& c)
@@ -30,7 +31,7 @@ void Entity::Render(Image* framebuffer, Camera* camera, const Color& c)
 
         // Projectem a clip space
         //utilitzem funcion de la camara
-        Vector3 p1 = camera->ProjectVector(w1);
+        Vector3 p1 = camera->ProjectVector(w1); //passa el punt de world a clip space(en perspectiva o ortografic)
         Vector3 p2 = camera->ProjectVector(w2);
         Vector3 p3 = camera->ProjectVector(w3);
 
@@ -56,4 +57,37 @@ void Entity::Render(Image* framebuffer, Camera* camera, const Color& c)
         framebuffer->DrawLineDDA(s2.x, s2.y, s3.x, s3.y, c);
         framebuffer->DrawLineDDA(s3.x, s3.y, s1.x, s1.y, c);
     }
+
+}
+
+void Entity::Update(float seconds_elapsed) { // haura de ser cirdada per render de entity
+
+    static float time = 0.0f; // cal que sigui static per que aixi guarda el temps entre frames
+    time += seconds_elapsed;
+
+    Matrix44 T, R, S;
+
+    switch (type)
+    {
+    case 0: // nomes translacio
+        T.MakeTranslationMatrix(sin(time) * 2.0f, 0.0f, -5.0f);
+        model = T;
+        break;
+
+    case 1: // nomes rota
+        T.MakeTranslationMatrix(0, 0, -5);
+        R.MakeRotationMatrix(time, Vector3(0, 1, 0));
+        model = T * R;
+        break;
+
+    case 2: // Nomes escalat
+    {
+        float s = 1.0f + 0.3f * sin(time);
+        T.MakeTranslationMatrix(0, 0, -5);
+        S.MakeScaleMatrix(s, s, s);
+        model = T * S;
+        break;
+    }
+    }
+    
 }

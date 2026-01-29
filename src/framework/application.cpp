@@ -24,21 +24,40 @@ Application::Application(const char* caption, int width, int height)
 Application::~Application()
 {
 }
+// fer tres entities com variables globals per fer-les servir a init, render, update...
+Entity* e1 = new Entity();
+Entity* e2 = new Entity();
+Entity* e3 = new Entity();
 
 void Application::Init(void)
 {
 	std::cout << "Initiating app..." << std::endl;
 	
-	Mesh* mesh = new Mesh();
-	mesh->LoadOBJ("meshes/lee.obj"); //carrega arxiu especificat
+	Mesh* mesh1 = new Mesh();
+	mesh1->LoadOBJ("meshes/lee.obj"); //carrega arxiu especificat
+	Mesh* mesh2 = new Mesh();
+	mesh2->LoadOBJ("meshes/anna.obj");
+	Mesh* mesh3 = new Mesh();
+	mesh3->LoadOBJ("meshes/cleo.obj"); 
 
-	this->scene_entity = new Entity(); 
-	this->scene_entity->mesh = mesh; // He fet els atributs publics enlloc de fer servir getters
 
-	this->scene_entity->model.MakeTranslationMatrix(0,0,-5); // matriu model mou en l eix z
+	e1->mesh = mesh1; // He fet els atributs publics enlloc de fer servir getters
+	e1->model.MakeTranslationMatrix(0,0,-5); // matriu model mou en l eix z
+
+	e2->mesh = mesh2; 
+	e2->model.MakeTranslationMatrix(0, 0, 0);
+
+	e3->mesh = mesh2;
+	e3->model.MakeTranslationMatrix(0, 0, 1);
+
+	e1->type = 0; 
+	e2->type = 1; 
+	e3->type = 2; 
 
 	//camera
 	this->camera = new Camera();
+	/*float aspect = framebuffer.width / float(framebuffer.height);
+	this->camera->SetPerspective(60.0f, aspect, 0.01f, 1000.0f); No se si cal*/
 
 
 }
@@ -46,9 +65,11 @@ void Application::Init(void)
 // Render one frame
 void Application::Render(void)
 {
-	if (scene_entity && camera) {
-		scene_entity->Render(&framebuffer, camera, Color(255, 255, 255));
-	}
+
+e1->Render(&framebuffer, camera, Color::WHITE);// blanc es color(255,255,255)
+e2->Render(&framebuffer, camera, Color::WHITE);
+e3->Render(&framebuffer, camera, Color::WHITE);
+
 
 	framebuffer.Render();
 }
@@ -56,6 +77,10 @@ void Application::Render(void)
 // Called after render
 void Application::Update(float seconds_elapsed)
 {
+
+e1->Update(seconds_elapsed);
+e2->Update(seconds_elapsed);
+e3->Update(seconds_elapsed);
 
 }
 
