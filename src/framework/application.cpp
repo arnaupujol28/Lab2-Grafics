@@ -5,6 +5,7 @@
 #include "entity.h"
 #include "camera.h"
 //hola
+//imbecil
 Application::Application(const char* caption, int width, int height)
 {
 	this->window = createWindow(caption, width, height);
