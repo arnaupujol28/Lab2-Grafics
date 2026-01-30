@@ -3,6 +3,7 @@
 #include "entity.h"
 #include "image.h"
 
+
 Entity::Entity() // constructor, ho inicialitza buit i despres ja es posa el que calgui
 {
     this->mesh = nullptr;
@@ -61,7 +62,7 @@ void Entity::Render(Image* framebuffer, Camera* camera, const Color& c)
 }
 
 void Entity::Update(float seconds_elapsed) { // haura de ser cirdada per render de entity
-
+    //s'encarrega de l'animacio modifica la matriu model
     static float time = 0.0f; // cal que sigui static per que aixi guarda el temps entre frames
     time += seconds_elapsed;
 

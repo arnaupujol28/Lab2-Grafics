@@ -18,7 +18,7 @@ Vector3 Camera::GetLocalVector(const Vector3& v)
 	return result;
 }
 
-Vector3 Camera::ProjectVector(Vector3 pos)
+Vector3 Camera::ProjectVector(Vector3 pos)//agafa un punt en el mon i li aplica les matrius de vista i projeccio
 {
 	Vector4 pos4 = Vector4(pos.x, pos.y, pos.z, 1.0); // passar a coords homogenies
 	Vector4 result = viewprojection_matrix * pos4; // world to clip
