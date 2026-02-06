@@ -17,14 +17,12 @@ public:
 	Camera* camera;
 
 	// Window
-	int render_mode = 1//feina 2.5
+	int render_mode = 1;//feina 2.5
 	char current_prop = 'V';///controla quina propietat modifiquem
 	//definim les entitats com atributs de la classe
 	Entity* e1;
 	Entity* e2;
 	Entity* e3;
-	int render_mode; //per controlar el mode de dibuix
-	char current_prop; //per controlar quina propietat modifiquem de la camara
 	SDL_Window* window = nullptr;
 	int window_width;
 	int window_height;

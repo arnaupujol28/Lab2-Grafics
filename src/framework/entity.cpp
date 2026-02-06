@@ -67,7 +67,7 @@ void Entity::Update(float seconds_elapsed) { // haura de ser cirdada per render 
     time += seconds_elapsed;
 
     Matrix44 T, R, S;
-
+    model.SetIdentity(); //sempre resetejem abans de començar
     switch (type)
     {
     case 0: // nomes translacio
@@ -75,7 +75,7 @@ void Entity::Update(float seconds_elapsed) { // haura de ser cirdada per render 
         model = T;
         break;
 
-    case 1: // nomes rota
+    case 1: // nomes rota sobre eix y
         T.MakeTranslationMatrix(0, 0, -5);
         R.MakeRotationMatrix(time, Vector3(0, 1, 0));
         model = T * R;

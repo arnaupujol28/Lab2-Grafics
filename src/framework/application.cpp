@@ -43,30 +43,32 @@ void Application::Init(void)
 
 
 	e1->mesh = mesh1; // He fet els atributs publics enlloc de fer servir getters
-	e1->model.MakeTranslationMatrix(0,0,-5); // matriu model mou en l eix z
+	e1->type = 0; //animació de translacio
+	e1->model.MakeTranslationMatrix(-3,0,0); // matriu model mou en l eix z
 
 	e2->mesh = mesh2; 
+	e2->type = 1; //animacio de rotacio
 	e2->model.MakeTranslationMatrix(0, 0, 0);
 
 	e3->mesh = mesh2;
-	e3->model.MakeTranslationMatrix(0, 0, 1);
-
-	e1->type = 0; 
-	e2->type = 1; 
-	e3->type = 2; 
+	e3->type = 2;//animacio d'escalat
+	e3->model.MakeTranslationMatrix(3, 0, 0);
 
 	//camera
 	this->camera = new Camera();
-	/*float aspect = framebuffer.width / float(framebuffer.height);
-	this->camera->SetPerspective(60.0f, aspect, 0.01f, 1000.0f); No se si cal*/
+	float aspect = framebuffer.width / float(framebuffer.height);//aspect radio perq no es deformi la imatge
+	this->camera->SetPerspective(60.0f, aspect, 0.01f, 1000.0f); //inicialitzem matriu de persepctiva
 
-
+	Vector3 eye(0, 5, 15); //coloquem l'eye lluny per poder veure els objecte
+	Vector3 center(0, 0, 0);
+	Vector3 up(0, 1, 0);
+	this->camera->LookAt(eye, center, up);
 }
 
 // Render one frame
 void Application::Render(void)
 {
-framebuffer.Clear(Color::BLACK);// neteja framebuffer
+framebuffer.Fill(Color::BLACK);// neteja framebuffer
 	
 // Render entities
 
@@ -77,6 +79,7 @@ else if (render_mode == 2) {
 	e1->Render(&framebuffer, camera, Color::WHITE);
 	e2->Render(&framebuffer, camera, Color::WHITE);
 	e3->Render(&framebuffer, camera, Color::WHITE);
+}
 {
 
 }
@@ -144,13 +147,13 @@ void Application::OnMouseButtonUp( SDL_MouseButtonEvent event )
 
 void Application::OnMouseMove(SDL_MouseButtonEvent event)
 {
-	if(mouse_state &SDLBUTTON_LMASK){//si apretem boto esquerre orbitem
+	if(mouse_state &SDL_BUTTON_LMASK){//si apretem boto esquerre orbitem
 		camera->Rotate(mouse_delta.x * 0.01f, Vector3(0, 1, 0)); //rotacio al voltant de l eix y
 	//mouse_delta.x representa quan sha mogut horitzontalment desde el ultim frame
 	//camera->rotate la cridem per aplicar el moviment com angle de rotacio
 	//ector3(0,1,0) indica q la rotacio es fa sobre el eix y
 	}
-	if (mouse_State & SDL_BUTTON_RMASK) {//si apretem boto dret fem desplaçament
+	if (mouse_state & SDL_BUTTON_RMASK) {//si apretem boto dret fem desplaçament
 		camera->center.x -= mouse_delta.x * 0.01f;
 		camera->center.y += mouse_delta.y * 0.01f;
 		//quan canvime el center la camara apunta a un altre lloc de lescenari
