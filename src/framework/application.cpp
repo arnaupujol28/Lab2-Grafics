@@ -48,11 +48,11 @@ void Application::Init(void)
 
 	e2->mesh = mesh2; 
 	e2->type = 1; //animacio de rotacio
-	e2->model.MakeTranslationMatrix(0, 0, 0);
+	//e2->model.MakeTranslationMatrix(0, 0, 0); aixo no fa res si hi ha animacio pq update ho mou
 
 	e3->mesh = mesh3;
 	e3->type = 2;//animacio d'escalat
-	e3->model.MakeTranslationMatrix(3, 0, 0);
+	// e3->model.MakeTranslationMatrix(5, 5, 3); aixo no fa res si hi ha animacio pq update ho mou
 
 	//camera
 	this->camera = new Camera();

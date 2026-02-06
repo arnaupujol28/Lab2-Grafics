@@ -83,7 +83,7 @@ void Entity::Update(float seconds_elapsed) { // haura de ser cirdada per render 
     case 2: // Nomes escalat
     {
         float s = 1.0f + 0.3f * sin(time);
-        T.MakeTranslationMatrix(0, 0, -5);
+        T.MakeTranslationMatrix(3, 0, -5);
         S.MakeScaleMatrix(s, s, s);
         model = T * S;
         break;
