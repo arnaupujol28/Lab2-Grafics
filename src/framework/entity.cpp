@@ -38,11 +38,10 @@ void Entity::Render(Image* framebuffer, Camera* camera, const Color& c)
 
         // CLIPPING 
         // nomes renderitzem si esta dins del rang [-1,1}
-        // per ferho comprovem q els 3 punts estan a dins
-        if (p1.x < -1 || p1.x > 1 || p1.y < -1 || p1.y > 1 || p1.z < -1 || p1.z > 1) continue;
-        if (p2.x < -1 || p2.x > 1 || p2.y < -1 || p2.y > 1 || p2.z < -1 || p2.z > 1) continue;
-        if (p3.x < -1 || p3.x > 1 || p3.y < -1 || p3.y > 1 || p3.z < -1 || p3.z > 1) continue;
-
+        bool is_p1_inside = p1.x >= -1 && p1.x <= 1 && p1.y >= -1 && p1.y <= 1 && p1.z >= -1 && p1.z <= 1;
+        bool is_p2_inside = p2.x >= -1 && p2.x <= 1 && p2.y >= -1 && p2.y <= 1 && p2.z >= -1 && p2.z <= 1;
+        bool is_p3_inside = p3.x >= -1 && p3.x <= 1 && p3.y >= -1 && p3.y <= 1 && p3.z >= -1 && p3.z <= 1;
+        if (!is_p1_inside && !is_p2_inside && !is_p3_inside) continue;// si els 3 estan fora no processem
         // clip space a screen space
         // Convertim el rang [-1, 1] a [0, width-1] i [0, height-1]
         float w = (float)framebuffer->width;

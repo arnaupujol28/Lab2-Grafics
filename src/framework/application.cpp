@@ -50,14 +50,15 @@ void Application::Init(void)
 	e2->type = 1; //animacio de rotacio
 	e2->model.MakeTranslationMatrix(0, 0, 0);
 
-	e3->mesh = mesh2;
+	e3->mesh = mesh3;
 	e3->type = 2;//animacio d'escalat
 	e3->model.MakeTranslationMatrix(3, 0, 0);
 
 	//camera
 	this->camera = new Camera();
+	float fov_graus = 60.0f;
 	float aspect = framebuffer.width / float(framebuffer.height);//aspect radio perq no es deformi la imatge
-	this->camera->SetPerspective(60.0f, aspect, 0.01f, 1000.0f); //inicialitzem matriu de persepctiva
+	this->camera->SetPerspective(fov_graus*DEG2RAD, aspect, 0.01f, 1000.0f); //inicialitzem matriu de persepctiva
 
 	Vector3 eye(0, 5, 15); //coloquem l'eye lluny per poder veure els objecte
 	Vector3 center(0, 0, 0);
@@ -79,9 +80,6 @@ else if (render_mode == 2) {
 	e1->Render(&framebuffer, camera, Color::WHITE);
 	e2->Render(&framebuffer, camera, Color::WHITE);
 	e3->Render(&framebuffer, camera, Color::WHITE);
-}
-{
-
 }
 
 	framebuffer.Render();
@@ -114,18 +112,18 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
 
 		case SDLK_PLUS:
 		case SDLK_KP_PLUS: // Tsi apretem mes
-			if (current_prop == 'V') camera->fov += 5 * DEG2RAD;
+			if (current_prop == 'V') camera->fov = clamp(camera->fov + 5 * DEG2RAD, 1 * DEG2RAD, 175 * DEG2RAD);
 			if (current_prop == 'N') camera->near_plane += 0.1f;
 			if (current_prop == 'F') camera->far_plane += 1.0f;
-			camera->UpdateProjectionMatrix(); // Recalculem matriu de projeccio
+			camera->UpdateProjectionMatrix();
 			break;
 
 		case SDLK_MINUS: //si apretem menys
 		case SDLK_KP_MINUS:
-			if (current_prop == 'V') camera->fov -= 5 * DEG2RAD;
-			if (current_prop == 'N') camera->near_plane -= 0.1f;
-			if (current_prop == 'F') camera->far_plane -= 1.0f;
-			camera->UpdateProjectionMatrix(); // Recalculem matriu de projeccio
+			if (current_prop == 'V') camera->fov = clamp(camera->fov - 5 * DEG2RAD, 1 * DEG2RAD, 175 * DEG2RAD);
+			if (current_prop == 'N') camera->near_plane = std::max(0.01f, camera->near_plane - 0.1f);
+			if (current_prop == 'F') camera->far_plane = std::max(camera->near_plane + 1.0f, camera->far_plane - 1.0f);
+			camera->UpdateProjectionMatrix();
 			break;
 	}
 
@@ -152,11 +150,14 @@ void Application::OnMouseMove(SDL_MouseButtonEvent event)
 	//mouse_delta.x representa quan sha mogut horitzontalment desde el ultim frame
 	//camera->rotate la cridem per aplicar el moviment com angle de rotacio
 	//ector3(0,1,0) indica q la rotacio es fa sobre el eix y
+		Vector3 right = camera->GetLocalVector(Vector3(1, 0, 0));
+		camera->Rotate(mouse_delta.y * 0.01f, right);
 	}
 	if (mouse_state & SDL_BUTTON_RMASK) {//si apretem boto dret fem desplaçament
-		camera->center.x -= mouse_delta.x * 0.01f;
-		camera->center.y += mouse_delta.y * 0.01f;
-		//quan canvime el center la camara apunta a un altre lloc de lescenari
+		Vector3 right = camera->GetLocalVector(Vector3(1, 0, 0));
+		Vector3 up = camera->GetLocalVector(Vector3(0, 1, 0));
+		camera->center = camera->center - right * mouse_delta.x * 0.01f;
+		camera->center = camera->center + up * mouse_delta.y * 0.01f;
 		camera->UpdateViewMatrix();
 	}
 }
@@ -168,9 +169,13 @@ void Application::OnWheel(SDL_MouseWheelEvent event) //per fer zoom a la camara 
 
 	// ...
 	Vector3 forward = camera->center - camera->eye;; //calcula el vector de direccio (o vector cap endavant de la camera) restant la posicio actual de la camera(eye) del punt q esta mirant (center)
-	camera->eye = camera->eye + forward * dy * 0.1f;//modifica la posicio fisica de la camera, si movem cap endavant dy es positiut ens apropem al objecte
-	// si movem cap enrere dy es negatiu i ens allunyem de l objecte
-	camera->UpdateViewMatrix(); //recalcula la matriu de vista
+	float dist = forward.Length();
+	forward.Normalize();
+	float new_dist = dist - dy * 0.5f;//ajustem el zoom sense perdre la direccio de la camara
+	if (new_dist > 0.1f) { // Evitam pasar el centre
+		camera->eye = camera->center - forward * new_dist;
+		camera->UpdateViewMatrix();
+	}
 }
 
 void Application::OnFileChanged(const char* filename)
@@ -178,3 +183,16 @@ void Application::OnFileChanged(const char* filename)
 	Shader::ReloadSingleShader(filename);
 }
 
+void Application::SetWindowSize(int width, int height)
+{
+	glViewport(0, 0, width, height);
+	this->window_width = width;
+	this->window_height = height;
+	this->framebuffer.Resize(width, height);
+
+	if (this->camera) {//perque quan canviem tamany finestra la malla no es deformi
+		float aspect = framebuffer.width / float(framebuffer.height);
+		this->camera->SetAspectRatio(aspect);
+		this->camera->UpdateProjectionMatrix();
+	}
+}

@@ -9,6 +9,8 @@
 #include "image.h"
 #include "entity.h"
 
+class Camera;
+
 class Application
 {
 public:
@@ -54,12 +56,8 @@ public:
 	void Update( float dt );
 
 	// Other methods to control the app
-	void SetWindowSize(int width, int height) {
-		glViewport( 0,0, width, height );
-		this->window_width = width;
-		this->window_height = height;
-		this->framebuffer.Resize(width, height);
-	}
+	void SetWindowSize(int width, int height);
+		
 
 	Vector2 GetWindowSize()
 	{
