@@ -437,3 +437,144 @@ void Image::DrawLineDDA(float x0, float y0, float x1, float y1, const Color& c) 
 		y += yInc;
 	}
 }
+
+void Image::ScanLineDDA(int x0, int y0, int x1, int y1, std::vector<Cell>& table) {//guarda les dades a la taula
+
+
+	float diferenciax = (float)(x1 - x0);
+	float diferenciay = (float)(y1 - y0);
+
+	// pasos
+	float pasos = std::max(std::abs(diferenciax), std::abs(diferenciay));
+
+	// Si pasos es 0 no pintem
+	if (pasos == 0) return;
+
+	// Incremet
+	float xInc = diferenciax / pasos;
+	float yInc = diferenciay / pasos;
+
+	float x = (float)x0;
+	float y = (float)y0;
+
+	// Recorrem la linea 
+	for (int i = 0; i <= pasos; i++) {
+		int currentY = (int)y;
+		int currentX = (int)x;
+
+		if (currentY >= 0 && currentY < (int)table.size()) { //nomes guatdem si la Y esta a dins de la imatge   table.size() es el mateix q la alçada de la imatge
+
+			if (currentX < table[currentY].minx) { //el x q estic mirant ara es mes petit
+				table[currentY].minx = currentX;
+			}
+
+			if (currentX > table[currentY].maxx) { //el x q miro es mes gran
+				table[currentY].maxx = currentX;
+			}
+		}
+
+		x += xInc;
+		y += yInc;
+	}
+}
+
+void Image::DrawTriangle(const Vector2& p0, const Vector2& p1, const Vector2& p2, const Color& borderColor, bool isFilled, const Color& fillColor) {
+	// const Vector2& p0, const Vector2& p1, const Vector2& p2 son els 3 vertex del triangle
+	//pose em & per passar el punt per refèrencia per que sigui mes rapid i no fem cap copia
+	//borderColor el color de la bora
+	//isFilled: true si volem pintar interior, false en cas contrari
+	// el color de linterior es fillColor
+
+	if (isFilled == true) { //si hem de pintar el triangle per dins fem
+
+		//creem taula
+		std::vector<Cell> table(height);
+
+		//omplim la taula dientli on son les vores
+		ScanLineDDA((int)p0.x, (int)p0.y, (int)p1.x, (int)p1.y, table);
+		ScanLineDDA((int)p1.x, (int)p1.y, (int)p2.x, (int)p2.y, table);
+		ScanLineDDA((int)p2.x, (int)p2.y, (int)p0.x, (int)p0.y, table);
+
+		for (int y = 0; y < height; y++) {
+
+			//si en aquesta fila hi ha bores
+			if (table[y].minx <= table[y].maxx) {
+
+				//evitem errors per sortinos de la pantalla
+				int startX = std::max(0, table[y].minx);
+				int endX = std::min((int)width - 1, table[y].maxx);
+
+				//bucle per pintar la linia
+				for (int x = startX; x <= endX; x++) {
+					SetPixel(x, y, fillColor);
+				}
+			}
+		}
+	}
+	//dibuixem bores
+	DrawLineDDA((int)p0.x, (int)p0.y, (int)p1.x, (int)p1.y, borderColor); //dibuixem aresta que va de p0 a p1
+	DrawLineDDA((int)p1.x, (int)p1.y, (int)p2.x, (int)p2.y, borderColor);
+	DrawLineDDA((int)p2.x, (int)p2.y, (int)p0.x, (int)p0.y, borderColor);
+}
+
+// La he d'acabar
+void Image::DrawTriangleInterpolated(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Color& c0, const Color& c1, const Color& c2) {
+
+	// cal passar a 2d
+
+	Vector2 A = Vector2(p0.x, p0.y);
+	Vector2 B = Vector2(p1.x, p1.y);
+	Vector2 C = Vector2(p2.x, p2.y);
+
+	// Preparar per recorrer
+
+	int minx = floor(std::min(A.x,B.x, C.x));
+	int maxx = ceil(std::min(A.x, B.x, C.x));
+	int miny = floor(std::min(A.y, B.y, C.y));
+	int maxy = ceil(std::min(A.y, B.y, C.y));
+
+	//Area
+
+	float Area = (B-A).Perpdot(C-A); // calculat fent servir p0(A) com a origen
+	// Perpdot fa el producte esclar de dos vectors 2d, el resultat nomes torna el component z de (0,0,z) que en valor absolut es el modul
+	//suposem Area CCW
+	if(Area == 0) return; // triangle sense area!
+
+	//Recorrer
+
+	for (int i = minx; i < maxx; ++i) {
+		for (int j = miny; j < maxx; ++j) {
+
+		Vector2 P = Vector2(i+0.5, j+0.5); // centre de cada pixel
+
+		//basat en el dibuix de les diapositives posant sempre com a centre P
+		float A0 = (B-P).Perpdot((C-P));
+		float A1 = (C-P).Perpdot(A-P);
+		float A2 = (A-P).Perpdot(B-P);
+
+		double alpha = A0 / Area;
+		double beta = A1/ Area;
+		double gamma = A2/ Area;
+
+		bool inside = (alpha >= 0 && beta >= 0 && gamma >= 0) || (alpha <= 0 && beta <= 0 && gamma <= 0);
+
+		if (inside == false) continue; // saltar al seguent pixel
+
+		//Interpolar color
+		float r = alpha * c0.r + beta * c1.r + gamma * c2.r;
+		float g = alpha * c0.g + beta * c1.g + gamma * c2.g;
+		float b = alpha * c0.b + beta * c1.b + gamma * c2.b;
+
+		Color out;
+		out.r = (unsigned char)clamp(r, 0.0f, 255.0f);
+		out.g = (unsigned char)clamp(g, 0.0f, 255.0f);
+		out.b = (unsigned char)clamp(b, 0.0f, 255.0f);
+
+		SetPixel(i, j, out);
+
+		}
+	}
+
+
+}
+

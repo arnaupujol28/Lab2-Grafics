@@ -20,6 +20,13 @@ class FloatImage;
 class Entity;
 class Camera;
 
+struct Cell { // per scanlineDDA
+	int minx;
+	int maxx;
+
+	Cell() : minx(INT_MAX), maxx(INT_MIN) {}
+};
+
 // A matrix of pixels
 class Image
 {
@@ -64,6 +71,13 @@ public:
 
 	//Dibuixar linia
 	void Image::DrawLineDDA(float x0, float y0, float x1, float y1, const Color& c);
+	
+	//Dibuixar triangle amb AET
+	void Image::ScanLineDDA(int x0, int y0, int x1, int y1, std::vector<Cell>& table);
+	void Image::DrawTriangle(const Vector2& p0, const Vector2& p1, const Vector2& p2, const Color& borderColor, bool isFilled, const Color& fillColor);
+
+	// dibuixar triangle amb interpolacio baricentrica
+	void Image::DrawTriangleInterpolated(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Color& c0, const Color& c1, const Color& c2);
 
 	void Resize(unsigned int width, unsigned int height);
 	void Scale(unsigned int width, unsigned int height);

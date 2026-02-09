@@ -52,10 +52,8 @@ void Entity::Render(Image* framebuffer, Camera* camera, const Color& c)
         Vector2 s2((p2.x + 1.0f) * 0.5f * (w - 1.0f), (p2.y + 1.0f) * 0.5f * (h - 1.0f));
         Vector2 s3((p3.x + 1.0f) * 0.5f * (w - 1.0f), (p3.y + 1.0f) * 0.5f * (h - 1.0f));
 
-        //Dibuixem les linies utilitzan el nostre algoritme DDA
-        framebuffer->DrawLineDDA(s1.x, s1.y, s2.x, s2.y, c);
-        framebuffer->DrawLineDDA(s2.x, s2.y, s3.x, s3.y, c);
-        framebuffer->DrawLineDDA(s3.x, s3.y, s1.x, s1.y, c);
+        //Dibuixem triangle
+        framebuffer->DrawTriangle(s1,s2,s3, Color::RED, true, Color::RED);
     }
 
 }
