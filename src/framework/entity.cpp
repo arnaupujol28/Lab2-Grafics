@@ -12,8 +12,40 @@ Entity::Entity() // constructor, ho inicialitza buit i despres ja es posa el que
     this->texture = nullptr;
 }
 
-void Entity::Render(Image* framebuffer, Camera* camera, FloatImage* zbuffer, bool show_texture, bool use_zbuffer, bool use_interpolation) {
+void Entity::Update(float seconds_elapsed) { // haura de ser cirdada per render de entity
+    //s'encarrega de l'animacio modifica la matriu model
+    static float time = 0.0f; // cal que sigui static per que aixi guarda el temps entre frames
+    time += seconds_elapsed;
+
+    Matrix44 T, R, S;
+    model.SetIdentity(); //sempre resetejem abans de començar
+    switch (type)
     {
+    case 0: // nomes translacio
+        T.MakeTranslationMatrix(sin(time) * 2.0f, 0.0f, -5.0f);
+        model = T;
+        break;
+
+    case 1: // nomes rota sobre eix y
+        T.MakeTranslationMatrix(0, 0, -5);
+        R.MakeRotationMatrix(time, Vector3(0, 1, 0));
+        model = T * R;
+        break;
+
+    case 2: // Nomes escalat
+    {
+        float s = 1.0f + 0.3f * sin(time);
+        T.MakeTranslationMatrix(3, 0, -5);
+        S.MakeScaleMatrix(s, s, s);
+        model = T * S;
+        break;
+    }
+    }
+
+}
+
+void Entity::Render(Image* framebuffer, Camera* camera, FloatImage* zbuffer, bool show_texture, bool use_zbuffer, bool use_interpolation) 
+{
     // btenim les dades de la malla (vèrtexs i Uvs
     const std::vector<Vector3>& vertices = mesh->GetVertices();
     const std::vector<Vector2>& uvs = mesh->GetUVs(); //
@@ -69,35 +101,6 @@ void Entity::Render(Image* framebuffer, Camera* camera, FloatImage* zbuffer, boo
                 );
             }
         }
-    }
-void Entity::Update(float seconds_elapsed) { // haura de ser cirdada per render de entity
-    //s'encarrega de l'animacio modifica la matriu model
-    static float time = 0.0f; // cal que sigui static per que aixi guarda el temps entre frames
-    time += seconds_elapsed;
-
-    Matrix44 T, R, S;
-    model.SetIdentity(); //sempre resetejem abans de començar
-    switch (type)
-    {
-    case 0: // nomes translacio
-        T.MakeTranslationMatrix(sin(time) * 2.0f, 0.0f, -5.0f);
-        model = T;
-        break;
-
-    case 1: // nomes rota sobre eix y
-        T.MakeTranslationMatrix(0, 0, -5);
-        R.MakeRotationMatrix(time, Vector3(0, 1, 0));
-        model = T * R;
-        break;
-
-    case 2: // Nomes escalat
-    {
-        float s = 1.0f + 0.3f * sin(time);
-        T.MakeTranslationMatrix(3, 0, -5);
-        S.MakeScaleMatrix(s, s, s);
-        model = T * S;
-        break;
-    }
-    }
-    
 }
+    
+

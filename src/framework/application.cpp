@@ -60,21 +60,21 @@ void Application::Init(void)
 	float aspect = framebuffer.width / float(framebuffer.height);//aspect radio perq no es deformi la imatge
 	this->camera->SetPerspective(fov_graus*DEG2RAD, aspect, 0.01f, 1000.0f); //inicialitzem matriu de persepctiva
 
-	Vector3 eye(0, 5, 15); //coloquem l'eye lluny per poder veure els objecte
-	Vector3 center(0, 0, 0);
+	Vector3 eye(0, 15, 5); //coloquem l'eye lluny per poder veure els objecte
+	Vector3 center(0, 15, 0);
 	Vector3 up(0, 1, 0);
 	this->camera->LookAt(eye, center, up);
 	e1->texture = new Image();
-	if (!e1->texture->LoadTGA("textures/lee.tga", true)) { // El 'true' voltea la Y
+	if (!e1->texture->LoadTGA("textures/lee_color_specular.tga", true)) { // El 'true' voltea la Y
 		std::cout << "Error carregant textura de Lee" << std::endl;
 	}
 	e2->texture = new Image();
-	if (!e2->texture->LoadTGA("textures/lee.tga", true)) { // El 'true' voltea la Y
-		std::cout << "Error carregant textura de Lee" << std::endl;
+	if (!e2->texture->LoadTGA("textures/anna_normal.tga", true)) { // El 'true' voltea la Y
+		std::cout << "Error carregant textura de anna" << std::endl;
 	}
 	e3->texture = new Image();
-	if (!e3->texture->LoadTGA("textures/lee.tga", true)) { // El 'true' voltea la Y
-		std::cout << "Error carregant textura de Lee" << std::endl;
+	if (!e3->texture->LoadTGA("textures/cleo_color_specular.tga", true)) { // El 'true' voltea la Y
+		std::cout << "Error carregant textura de Cleo" << std::endl;
 	}
 }
 
