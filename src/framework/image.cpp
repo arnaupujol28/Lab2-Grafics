@@ -539,15 +539,22 @@ void Image::DrawTriangleInterpolated(const Vector3& p0, const Vector3& p1, const
 	float Area = (B - A).Perpdot(C - A);
 	if (Area == 0) return; // Evitem divisió per 0 si el triangle no té àrea
 
+
+	// preparar per recorrer pantalla
+	int startX = std::max(0,minx);
+	int endX = std::min((int)width - 1, maxx);
+	int startY = std::max(0, miny);
+	int endY = std::min((int)height - 1, maxy);
+
 	// clipping de pantalla 
-	for (int i = std::max(0, minx); i < std::min((int)width, maxx); ++i) {
-		for (int j = std::max(0, miny); j < std::min((int)height, maxy); ++j) {
+	for (int i = startX; i <= endX; ++i) {
+		for (int j = startY; j <= endY; ++j) {
 
 			Vector2 P(i + 0.5f, j + 0.5f); // Centre del píxel per a la discretització
 
 			
 			float A0 = (B - P).Perpdot(C - P);
-			float A1 = (C - P).Dot(Vector2(A.y - P.y, -(A.x - P.x))); 
+			float A1 = (C - P).Perpdot(A - P);
 			float A2 = (A - P).Perpdot(B - P);
 
 			float alpha = A0 / Area;
@@ -574,7 +581,18 @@ void Image::DrawTriangleInterpolated(const Vector3& p0, const Vector3& p1, const
 					//  Texturitzat vs Color 
 					if (texture != nullptr) {
 						// Interpolem UVs
-						Vector2 interpolatedUV = uv0 * alpha + uv1 * beta + uv2 * gamma;
+						float invZ0 = 1.0f / p0.z;
+						float invZ1 = 1.0f / p1.z;
+						float invZ2 = 1.0f / p2.z;
+
+						Vector2 uv0p = uv0 * invZ0;
+						Vector2 uv1p = uv1 * invZ1;
+						Vector2 uv2p = uv2 * invZ2;
+
+						float invZp = alpha * invZ0 + beta * invZ1 + gamma * invZ2;
+						Vector2 uvp = uv0p * alpha + uv1p * beta + uv2p * gamma;
+
+						Vector2 interpolatedUV = uvp * (1.0f / invZp);
 						// Transformem a espai de textura 
 						int texX = (int)(interpolatedUV.x * (texture->width - 1));
 						int texY = (int)(interpolatedUV.y * (texture->height - 1));

@@ -65,23 +65,26 @@ void Application::Init(void)
 	Vector3 up(0, 1, 0);
 	this->camera->LookAt(eye, center, up);
 	e1->texture = new Image();
-	if (!e1->texture->LoadTGA("textures/lee_color_specular.tga", true)) { // El 'true' voltea la Y
+	if (!e1->texture->LoadTGA("textures/lee_normal.tga", false)) { // El 'true' voltea la Y
 		std::cout << "Error carregant textura de Lee" << std::endl;
 	}
 	e2->texture = new Image();
-	if (!e2->texture->LoadTGA("textures/anna_normal.tga", true)) { // El 'true' voltea la Y
+	if (!e2->texture->LoadTGA("textures/anna_color_specular.tga", false)) { // El 'true' voltea la Y
 		std::cout << "Error carregant textura de anna" << std::endl;
 	}
 	e3->texture = new Image();
-	if (!e3->texture->LoadTGA("textures/cleo_color_specular.tga", true)) { // El 'true' voltea la Y
+	if (!e3->texture->LoadTGA("textures/cleo_color_specular.tga", false)) { // El 'true' voltea la Y
 		std::cout << "Error carregant textura de Cleo" << std::endl;
 	}
+
+
 }
 
 // Render one frame
 void Application::Render(void)
 {
 framebuffer.Fill(Color::BLACK);// neteja framebuffer
+
 	
 // Crear i netejar el Z-Buffer en cada frame
 FloatImage zBuffer(framebuffer.width, framebuffer.height);
@@ -94,6 +97,7 @@ if (render_mode == 1) {
 else if (render_mode == 2) {
 	e1->Render(&framebuffer, camera, &zBuffer, show_texture, use_zbuffer, use_interpolation);
 	e2->Render(&framebuffer, camera, &zBuffer, show_texture, use_zbuffer, use_interpolation);
+	e3->Render(&framebuffer, camera, &zBuffer, show_texture, use_zbuffer, use_interpolation);
 }
 
 	framebuffer.Render();
