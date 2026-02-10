@@ -17,7 +17,9 @@ public:
 
 	Entity* scene_entity;
 	Camera* camera;
-
+	bool show_texture = true;      // Controla la tecla 'T' 
+	bool use_zbuffer = true;       // Controla la tecla 'Z' 
+	bool use_interpolation = true; // Controla la tecla 'C' 
 	// Window
 	int render_mode = 1;//feina 2.5
 	char current_prop = 'V';///controla quina propietat modifiquem

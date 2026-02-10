@@ -64,6 +64,18 @@ void Application::Init(void)
 	Vector3 center(0, 0, 0);
 	Vector3 up(0, 1, 0);
 	this->camera->LookAt(eye, center, up);
+	e1->texture = new Image();
+	if (!e1->texture->LoadTGA("textures/lee.tga", true)) { // El 'true' voltea la Y
+		std::cout << "Error carregant textura de Lee" << std::endl;
+	}
+	e2->texture = new Image();
+	if (!e2->texture->LoadTGA("textures/lee.tga", true)) { // El 'true' voltea la Y
+		std::cout << "Error carregant textura de Lee" << std::endl;
+	}
+	e3->texture = new Image();
+	if (!e3->texture->LoadTGA("textures/lee.tga", true)) { // El 'true' voltea la Y
+		std::cout << "Error carregant textura de Lee" << std::endl;
+	}
 }
 
 // Render one frame
@@ -71,15 +83,17 @@ void Application::Render(void)
 {
 framebuffer.Fill(Color::BLACK);// neteja framebuffer
 	
+// Crear i netejar el Z-Buffer en cada frame
+FloatImage zBuffer(framebuffer.width, framebuffer.height);
+zBuffer.Fill(10000.0f);
 // Render entities
 
 if (render_mode == 1) {
-	e1->Render(&framebuffer, camera, Color::WHITE);// momes 1
+	e1->Render(&framebuffer, camera, &zBuffer, show_texture, use_zbuffer, use_interpolation);
 } 
 else if (render_mode == 2) {
-	e1->Render(&framebuffer, camera, Color::WHITE);
-	e2->Render(&framebuffer, camera, Color::WHITE);
-	e3->Render(&framebuffer, camera, Color::WHITE);
+	e1->Render(&framebuffer, camera, &zBuffer, show_texture, use_zbuffer, use_interpolation);
+	e2->Render(&framebuffer, camera, &zBuffer, show_texture, use_zbuffer, use_interpolation);
 }
 
 	framebuffer.Render();
@@ -124,6 +138,21 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
 			if (current_prop == 'N') camera->near_plane = std::max(0.01f, camera->near_plane - 0.1f);
 			if (current_prop == 'F') camera->far_plane = std::max(camera->near_plane + 1.0f, camera->far_plane - 1.0f);
 			camera->UpdateProjectionMatrix();
+			break;
+
+		case SDLK_t:
+			show_texture = !show_texture;
+			// Toggle entre utilitzar textura de malla o color per vèrtex 
+			std::cout << "Toggle: Mode Textura" << std::endl;
+			break;
+		case SDLK_z:
+			use_zbuffer = !use_zbuffer;
+			std::cout << "Toggle: Z-Buffer" << std::endl;
+			break;
+		case SDLK_c:
+			use_interpolation = !use_interpolation;
+			// Toggle entre UVs interpolades o color pla 
+			std::cout << "Toggle: Interpolacio" << std::endl;
 			break;
 	}
 

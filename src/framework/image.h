@@ -44,7 +44,12 @@ public:
 	unsigned int bytes_per_pixel = 3; // Bits per pixel
 
 	Color* pixels;
-
+	struct sTriangleInfo {
+		Vector3 p0, p1, p2;    // posicions projectades
+		Vector2 uv0, uv1, uv2; // Coordenades de textura
+		Color c0, c1, c2;      // Colors dels vertexs
+		Image* texture;        // Punter a la textura de l'entitat
+	};
 	// Constructors
 	Image();
 	Image(unsigned int width, unsigned int height);
@@ -77,7 +82,10 @@ public:
 	void Image::DrawTriangle(const Vector2& p0, const Vector2& p1, const Vector2& p2, const Color& borderColor, bool isFilled, const Color& fillColor);
 
 	// dibuixar triangle amb interpolacio baricentrica
-	void Image::DrawTriangleInterpolated(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Color& c0, const Color& c1, const Color& c2);
+	void Image::DrawTriangleInterpolated(const Vector3& p0, const Vector3& p1, const Vector3& p2,
+		const Color& c0, const Color& c1, const Color& c2,
+		FloatImage* zbuffer, Image* texture,
+		const Vector2& uv0, const Vector2& uv1, const Vector2& uv2);
 
 	void Resize(unsigned int width, unsigned int height);
 	void Scale(unsigned int width, unsigned int height);

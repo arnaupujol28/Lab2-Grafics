@@ -433,8 +433,8 @@ void Image::DrawLineDDA(float x0, float y0, float x1, float y1, const Color& c) 
 
 		this->SetPixel(xi, yi, c);
 
-		x += xInc;
-		y += yInc;
+x += xInc;
+y += yInc;
 	}
 }
 
@@ -518,63 +518,80 @@ void Image::DrawTriangle(const Vector2& p0, const Vector2& p1, const Vector2& p2
 }
 
 // La he d'acabar
-void Image::DrawTriangleInterpolated(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Color& c0, const Color& c1, const Color& c2) {
 
-	// cal passar a 2d
+void Image::DrawTriangleInterpolated(const Vector3& p0, const Vector3& p1, const Vector3& p2,
+	const Color& c0, const Color& c1, const Color& c2,
+	FloatImage* zbuffer, Image* texture,
+	const Vector2& uv0, const Vector2& uv1, const Vector2& uv2)
+{
+	// Preparem coordenades 2D per al càlcul d'àrees
+	Vector2 A(p0.x, p0.y);
+	Vector2 B(p1.x, p1.y);
+	Vector2 C(p2.x, p2.y);
 
-	Vector2 A = Vector2(p0.x, p0.y);
-	Vector2 B = Vector2(p1.x, p1.y);
-	Vector2 C = Vector2(p2.x, p2.y);
+	
+	int minx = (int)floor(std::min({ A.x, B.x, C.x }));
+	int maxx = (int)ceil(std::max({ A.x, B.x, C.x }));
+	int miny = (int)floor(std::min({ A.y, B.y, C.y }));
+	int maxy = (int)ceil(std::max({ A.y, B.y, C.y }));
 
-	// Preparar per recorrer
+	// Àrea total del triangle mitjançant el producte vectorial
+	float Area = (B - A).Perpdot(C - A);
+	if (Area == 0) return; // Evitem divisió per 0 si el triangle no té àrea
 
-	int minx = floor(std::min(A.x,B.x, C.x));
-	int maxx = ceil(std::min(A.x, B.x, C.x));
-	int miny = floor(std::min(A.y, B.y, C.y));
-	int maxy = ceil(std::min(A.y, B.y, C.y));
+	// clipping de pantalla 
+	for (int i = std::max(0, minx); i < std::min((int)width, maxx); ++i) {
+		for (int j = std::max(0, miny); j < std::min((int)height, maxy); ++j) {
 
-	//Area
+			Vector2 P(i + 0.5f, j + 0.5f); // Centre del píxel per a la discretització
 
-	float Area = (B-A).Perpdot(C-A); // calculat fent servir p0(A) com a origen
-	// Perpdot fa el producte esclar de dos vectors 2d, el resultat nomes torna el component z de (0,0,z) que en valor absolut es el modul
-	//suposem Area CCW
-	if(Area == 0) return; // triangle sense area!
+			
+			float A0 = (B - P).Perpdot(C - P);
+			float A1 = (C - P).Dot(Vector2(A.y - P.y, -(A.x - P.x))); 
+			float A2 = (A - P).Perpdot(B - P);
 
-	//Recorrer
+			float alpha = A0 / Area;
+			float beta = A1 / Area;
+			float gamma = A2 / Area;
 
-	for (int i = minx; i < maxx; ++i) {
-		for (int j = miny; j < maxx; ++j) {
+			// Normalitzem els pesos perquè sumin  1 
+			float sum = alpha + beta + gamma;
+			alpha /= sum; beta /= sum; gamma /= sum;
 
-		Vector2 P = Vector2(i+0.5, j+0.5); // centre de cada pixel
+			// Comprovem si el píxel està dins del triangle 
+			if (alpha >= 0 && beta >= 0 && gamma >= 0) {
 
-		//basat en el dibuix de les diapositives posant sempre com a centre P
-		float A0 = (B-P).Perpdot((C-P));
-		float A1 = (C-P).Perpdot(A-P);
-		float A2 = (A-P).Perpdot(B-P);
+				//Interpolem la profunditat Z
+				float z = alpha * p0.z + beta * p1.z + gamma * p2.z;
 
-		double alpha = A0 / Area;
-		double beta = A1/ Area;
-		double gamma = A2/ Area;
+				// Z-Buffer:
+				// Test del Z-Buffer: si el punter existeix
+				if (zbuffer == nullptr || z < zbuffer->GetPixel(i, j)) {
+					if (zbuffer != nullptr) zbuffer->SetPixelUnsafe(i, j, z);
 
-		bool inside = (alpha >= 0 && beta >= 0 && gamma >= 0) || (alpha <= 0 && beta <= 0 && gamma <= 0);
+					Color finalColor;
 
-		if (inside == false) continue; // saltar al seguent pixel
+					//  Texturitzat vs Color 
+					if (texture != nullptr) {
+						// Interpolem UVs
+						Vector2 interpolatedUV = uv0 * alpha + uv1 * beta + uv2 * gamma;
+						// Transformem a espai de textura 
+						int texX = (int)(interpolatedUV.x * (texture->width - 1));
+						int texY = (int)(interpolatedUV.y * (texture->height - 1));
+						// Llegim el píxel de la textura 
+						finalColor = texture->GetPixelSafe(texX, texY);
+					}
+					else {
+						// Si no hi ha textura, usem interpolació de colors de vèrtex 
+						float r = alpha * c0.r + beta * c1.r + gamma * c2.r;
+						float g = alpha * c0.g + beta * c1.g + gamma * c2.g;
+						float b = alpha * c0.b + beta * c1.b + gamma * c2.b;
+						finalColor.Set(r, g, b);
+					}
 
-		//Interpolar color
-		float r = alpha * c0.r + beta * c1.r + gamma * c2.r;
-		float g = alpha * c0.g + beta * c1.g + gamma * c2.g;
-		float b = alpha * c0.b + beta * c1.b + gamma * c2.b;
-
-		Color out;
-		out.r = (unsigned char)clamp(r, 0.0f, 255.0f);
-		out.g = (unsigned char)clamp(g, 0.0f, 255.0f);
-		out.b = (unsigned char)clamp(b, 0.0f, 255.0f);
-
-		SetPixel(i, j, out);
-
+					SetPixelUnsafe(i, j, finalColor); // Pintem al framebuffer
+				}
+			}
 		}
 	}
-
-
 }
-
