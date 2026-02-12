@@ -65,7 +65,7 @@ void Application::Init(void)
 	Vector3 up(0, 1, 0);
 	this->camera->LookAt(eye, center, up);
 	e1->texture = new Image();
-	if (!e1->texture->LoadTGA("textures/lee_normal.tga", false)) { // El 'true' voltea la Y
+	if (!e1->texture->LoadTGA("textures/lee_color_specular.tga", false)) { // El 'true' voltea la Y
 		std::cout << "Error carregant textura de Lee" << std::endl;
 	}
 	e2->texture = new Image();
