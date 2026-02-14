@@ -7,13 +7,26 @@
 #include "main/includes.h"
 #include "framework.h"
 #include "image.h"
+#include "entity.h"
+
+class Camera;
 
 class Application
 {
 public:
 
+	Entity* scene_entity;
+	Camera* camera;
+	bool show_texture = true;      // Controla la tecla 'T' 
+	bool use_zbuffer = true;       // Controla la tecla 'Z' 
+	bool use_interpolation = true; // Controla la tecla 'C' 
 	// Window
-
+	int render_mode = 1;//feina 2.5
+	char current_prop = 'V';///controla quina propietat modifiquem
+	//definim les entitats com atributs de la classe
+	Entity* e1;
+	Entity* e2;
+	Entity* e3;
 	SDL_Window* window = nullptr;
 	int window_width;
 	int window_height;
@@ -45,12 +58,8 @@ public:
 	void Update( float dt );
 
 	// Other methods to control the app
-	void SetWindowSize(int width, int height) {
-		glViewport( 0,0, width, height );
-		this->window_width = width;
-		this->window_height = height;
-		this->framebuffer.Resize(width, height);
-	}
+	void SetWindowSize(int width, int height);
+		
 
 	Vector2 GetWindowSize()
 	{

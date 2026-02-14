@@ -6,6 +6,8 @@
 #pragma once
 
 #include "framework.h"
+#include "entity.h"
+#include "camera.h"
 
 class Camera
 {
