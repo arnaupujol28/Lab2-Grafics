@@ -6,7 +6,7 @@
 Camera::Camera()
 {
 	view_matrix.SetIdentity();
-	SetOrthographic(-1,1,1,-1,-10,10);
+	SetOrthographic(-1,1,1,-1,-1,1);
 }
 
 Vector3 Camera::GetLocalVector(const Vector3& v)
@@ -18,25 +18,22 @@ Vector3 Camera::GetLocalVector(const Vector3& v)
 	return result;
 }
 
-Vector3 Camera::ProjectVector(Vector3 pos)//agafa un punt en el mon i li aplica les matrius de vista i projeccio
+Vector3 Camera::ProjectVector(Vector3 pos)
 {
-	Vector4 pos4 = Vector4(pos.x, pos.y, pos.z, 1.0); // passar a coords homogenies
-	Vector4 result = viewprojection_matrix * pos4; // world to clip
+	Vector4 pos4 = Vector4(pos.x, pos.y, pos.z, 1.0);
+	Vector4 result = viewprojection_matrix * pos4;
 	if (type == ORTHOGRAPHIC)
 		return result.GetVector3();
 	else
-		return result.GetVector3() / result.w; // dividir per w crea l'efecte de perspectiva
+		return result.GetVector3() / result.w;
 }
 
 void Camera::Rotate(float angle, const Vector3& axis)
 {
 	Matrix44 R;
 	R.MakeRotationMatrix(angle, axis);
-	Vector3 dist = eye - center; //per orbitar rotem el eix
-	Vector3 new_dist = R*dist;
-
-	//nova posicio del ull per mantenir la distancia amb el centre
-	eye = center + new_dist;
+	Vector3 new_front = R * (center - eye);
+	center = eye + new_front;
 	UpdateViewMatrix();
 }
 
@@ -82,88 +79,45 @@ void Camera::LookAt(const Vector3& eye, const Vector3& center, const Vector3& up
 
 	UpdateViewMatrix();
 }
-/* construir la view matrix(mon--> camara, viewing transformation) la classe camara te els seus atributs, aqui es fan servir i es modifica la viewmatrix
-* La view matrix es |R U -F T|
-					|0 0  0 1| pero amb la manera de matrix44 canviem el vector T com a ultima fila i la coord homogenia com a ultima columna*/
-void Camera::UpdateViewMatrix()// R eix x de la camara. Forward direccio on mira la cam(-z). U és l'up vector aproximadament ortogonal
+
+void Camera::UpdateViewMatrix()
 {
 	// Reset Matrix (Identity)
 	view_matrix.SetIdentity();
 
 	// Comment this line to create your own projection matrix!
-	//SetExampleViewMatrix();
-
-	view_matrix.SetIdentity();
-
-	Vector3 F = center - eye;   // el vector forward(vector de la camara al punt on mira) es el centre(punt on mira) - eye(punt en el que esta) 
-	F.Normalize();
-
-	Vector3 R = F.Cross(this->up);    // perpendicular al forward i al up de la camara
-	R.Normalize();
-
-	Vector3 U = R.Cross(F);     // up corregit = R X U
+	SetExampleViewMatrix();
 
 	// Remember how to fill a Matrix4x4 (check framework slides)
 	// Careful with the order of matrix multiplications, and be sure to use normalized vectors!
 	
-	//omplim la matriu de vista
-	view_matrix.M[0][0] = R.x;  view_matrix.M[0][1] = U.x;  view_matrix.M[0][2] = -F.x;
-	view_matrix.M[1][0] = R.y;  view_matrix.M[1][1] = U.y;  view_matrix.M[1][2] = -F.y;
-	view_matrix.M[2][0] = R.z;  view_matrix.M[2][1] = U.z;  view_matrix.M[2][2] = -F.z;
+	// Create the view matrix rotation
+	// ...
+	// view_matrix.M[3][3] = 1.0;
 
-	//part de translacio
-	view_matrix.M[0][3] = -R.Dot(eye);
-	view_matrix.M[1][3] = -U.Dot(eye);
-	view_matrix.M[2][3] = F.Dot(eye);
-	view_matrix.M[3][3] = 1.0f;
+	// Translate view matrix
+	// ...
+
 	UpdateViewProjectionMatrix();
 }
 
-// Create a projection matrix(camara/view a view volume/clip space?)
-void Camera::UpdateProjectionMatrix() 
+// Create a projection matrix
+void Camera::UpdateProjectionMatrix()
 {
 	// Reset Matrix (Identity)
 	projection_matrix.SetIdentity();
 
 	// Comment this line to create your own projection matrix!
-	//SetExampleProjectionMatrix();
+	SetExampleProjectionMatrix();
 
 	// Remember how to fill a Matrix4x4 (check framework slides)
 	
 	if (type == PERSPECTIVE) {
-		
-		float f = 1.0f / tanf(fov * 0.5f); // fov en radians
-		float n = near_plane;
-		float fa = far_plane;
-
-		projection_matrix.Clear();//tot a 0 per claredat
-
-		//pg 27 presentacio
-		projection_matrix.M[0][0] = f / aspect; // aspect = w/h
-		projection_matrix.M[1][1] = f;
-
-		projection_matrix.M[2][2] = (fa + n) / (n - fa);
-		projection_matrix.M[3][2] = (2.0f * fa * n) / (n - fa);
-
-		projection_matrix.M[2][3] = -1.0f;
-		projection_matrix.M[3][3] = 0.0f;
+		// projection_matrix.M[2][3] = -1;
+		// ...
 	}
 	else if (type == ORTHOGRAPHIC) {
 		// ...
-		float l = left, r = right, t = top, b = bottom;
-		float n = near_plane, fa = far_plane;
-
-		projection_matrix.Clear();
-
-		//pg 25
-		projection_matrix.M[0][0] = 2.0f / (r - l);
-		projection_matrix.M[1][1] = 2.0f / (t - b);
-		projection_matrix.M[2][2] = -2.0f / (fa - n);
-		projection_matrix.M[3][3] = 1.0f;
-
-		projection_matrix.M[3][0] = -(r + l) / (r - l);
-		projection_matrix.M[3][1] = -(t + b) / (t - b);
-		projection_matrix.M[3][2] = -(fa + n) / (fa - n);
 	} 
 
 	UpdateViewProjectionMatrix();
@@ -171,7 +125,7 @@ void Camera::UpdateProjectionMatrix()
 
 void Camera::UpdateViewProjectionMatrix()
 {
-	viewprojection_matrix = projection_matrix * view_matrix; // world to clip(view to clip * wolrd to view)
+	viewprojection_matrix = projection_matrix * view_matrix;
 }
 
 Matrix44 Camera::GetViewProjectionMatrix()
