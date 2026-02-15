@@ -1,4 +1,4 @@
-/*  
+/*
 	+ This class encapsulates the application, is in charge of creating the data, getting the user input, process the update and render.
 */
 
@@ -7,26 +7,15 @@
 #include "main/includes.h"
 #include "framework.h"
 #include "image.h"
-#include "entity.h"
-
-class Camera;
-
+#include "mesh.h" 
+#include "shader.h" 
+#include "texture.h"
 class Application
 {
 public:
 
-	Entity* scene_entity;
-	Camera* camera;
-	bool show_texture = true;      // Controla la tecla 'T' 
-	bool use_zbuffer = true;       // Controla la tecla 'Z' 
-	bool use_interpolation = true; // Controla la tecla 'C' 
 	// Window
-	int render_mode = 1;//feina 2.5
-	char current_prop = 'V';///controla quina propietat modifiquem
-	//definim les entitats com atributs de la classe
-	Entity* e1;
-	Entity* e2;
-	Entity* e3;
+
 	SDL_Window* window = nullptr;
 	int window_width;
 	int window_height;
@@ -52,19 +41,27 @@ public:
 	// Constructor and main methods
 	Application(const char* caption, int width, int height);
 	~Application();
+	Mesh* quad_mesh;
+	Shader* shader_ex1;
 
-	void Init( void );
-	void Render( void );
-	void Update( float dt );
+	Texture fruits;
+
+	void Init(void);
+	void Render(void);
+	void Update(float dt);
 
 	// Other methods to control the app
-	void SetWindowSize(int width, int height);
-		
+	void SetWindowSize(int width, int height) {
+		glViewport(0, 0, width, height);
+		this->window_width = width;
+		this->window_height = height;
+		this->framebuffer.Resize(width, height);
+	}
 
 	Vector2 GetWindowSize()
 	{
-		int w,h;
-		SDL_GetWindowSize(window,&w,&h);
+		int w, h;
+		SDL_GetWindowSize(window, &w, &h);
 		return Vector2(float(w), float(h));
 	}
 };
