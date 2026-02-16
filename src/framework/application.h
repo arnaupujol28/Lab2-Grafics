@@ -37,13 +37,13 @@ public:
 
 	// CPU Global framebuffer
 	Image framebuffer;
-
 	// Constructor and main methods
 	Application(const char* caption, int width, int height);
 	~Application();
 	Mesh* quad_mesh;
 	Shader* shader_ex1;
-
+	int control_tasca = 1;
+	char control_subtasca = 'a';
 	Texture fruits;
 
 	void Init(void);
