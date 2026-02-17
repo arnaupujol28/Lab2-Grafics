@@ -71,11 +71,16 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
 		case SDLK_2: control_tasca = 2; break;
 		case SDLK_3: control_tasca = 3; break;
 		case SDLK_4: control_tasca = 4; break;
+		case SDLK_5: control_tasca = 5; break;
+		case SDLK_6: control_tasca = 6; break;
 
 			// Teclas de la 'a' a la 'f' para las subtareas 
 		case SDLK_a: control_subtasca = 'a'; break;
 		case SDLK_b: control_subtasca = 'b'; break;
 		case SDLK_c: control_subtasca = 'c'; break;
+		case SDLK_d: control_subtasca = 'd'; break;
+		case SDLK_e: control_subtasca = 'e'; break;
+		case SDLK_f: control_subtasca = 'f'; break;
 	}
 }
 

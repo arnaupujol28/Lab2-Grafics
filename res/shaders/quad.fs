@@ -23,7 +23,54 @@ void main()
 			vec4 vermell = vec4(barraVertical, 0.0, 0.0, 1.0);
             		vec4 blau= vec4(0.0, 0.0, barraHoritzontal, 1.0);
             		gl_FragColor = vec4(barraVertical,0.0,barraHoritzontal,1.0);
+		}else if (u_subtasca == 3){
+    			vec2 uv = v_uv;          // IMPORTANT: declarar uv
+    			float N = 16.0;          // nombre de divisions (graella)
+    			// quantització a graella
+    			vec2 uv_q = floor(uv * N) / (N - 1.0);
+    			gl_FragColor = vec4(uv_q.x, uv_q.y, 0.0, 1.0);
+			
+		}else if (u_subtasca == 4){
+    			vec2 uv = v_uv;
+
+    			float N = 12.0;                  // nombre de quadrats per eix (ajusta-ho)
+    			vec2 cell = floor(uv * N);       // (i,j) de la cel·la
+
+    			// 0 o 1 alternant (escacs)
+    			float checker = mod(cell.x + cell.y, 2.0);
+
+    			// checker=0 -> negre, checker=1 -> blanc
+    			gl_FragColor = vec4(vec3(checker), 1.0);
+		}else if (u_subtasca == 5){
+    			vec2 uv = v_uv;
+	
+    			float y0   = 0.55;
+    			float amp  = 0.20;
+    			float freq = 1.0;
+    			float y_curve = y0 + amp * sin(6.2831853 * freq * uv.x);
+
+    			// dos degradats fins a la corba
+ 
+    			// per sota: g = uv.y 
+    			float g_below = uv.y;
+
+    			// per sobre: g = (1-uv.y)
+    			float g_above = (1.0 - uv.y);
+
+    			//Selecció
+    			// s = 1 si uv.y >= y_curve, 0 altrament
+    			float s = step(y_curve, uv.y);
+
+    			// 4)si a dalt g_above, si a baix g_below
+    			float g = mix(g_below, g_above, s);
+
+    			g = clamp(g, 0.0, 1.0); //limitar valor
+    			g = pow(g, 2.0); // contrast
+
+    			gl_FragColor = vec4(0.0, g, 0.0, 1.0);
 		}
+
+		
 	}
 	
 }
