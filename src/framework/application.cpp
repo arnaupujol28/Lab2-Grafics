@@ -20,6 +20,8 @@ Application::Application(const char* caption, int width, int height)
 	this->control_tasca = 0;
 	this->control_subtasca = ' ';
 	this->framebuffer.Resize(w, h);
+	this->fruits = nullptr;
+	this->messi = nullptr;
 }
 
 Application::~Application()
@@ -36,7 +38,8 @@ void Application::Init(void)
 	shader_ex1 = new Shader();
 	shader_ex1->Load("shaders/quad.vs", "shaders/quad.fs");
 
-
+	fruits = Texture::Get("images/fruits.png"); //carreguem la textura
+	messi = Texture::Get("images/messi.png");
 }
 
 // Render one frame
@@ -48,16 +51,22 @@ void Application::Render(void)
 	shader_ex1->Enable();
 	shader_ex1->SetUniform1("u_tasca", control_tasca);
 	shader_ex1->SetUniform1("u_subtasca", (int)(control_subtasca - 'a'));//passe, submtasca com un enter
+	shader_ex1->SetUniform1("u_time", this->time);
+	if (control_tasca == 2 && fruits != nullptr) {
+		shader_ex1->SetTexture("u_texture", fruits);
+	}
+	else if (control_tasca == 3 && messi != nullptr) {
+		shader_ex1->SetTexture("u_texture", messi);
+	}
 	quad_mesh->Render();
 	shader_ex1->Disable();
-
 
 }
 
 // Called after render
 void Application::Update(float seconds_elapsed)
 {
-
+	this->time += seconds_elapsed;//fem q el temps avanci
 }
 
 //keyboard press event 
@@ -68,8 +77,12 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
 		case SDLK_ESCAPE: exit(0); break; // ESC key, kill the app
 		
 		case SDLK_1: control_tasca = 1; break;
-		case SDLK_2: control_tasca = 2; break;
-		case SDLK_3: control_tasca = 3; break;
+		case SDLK_2: control_tasca = 2; 
+			control_subtasca = 'z';
+			break;
+		case SDLK_3: control_tasca = 3; 
+			control_subtasca = 'z';
+			break;
 		case SDLK_4: control_tasca = 4; break;
 		case SDLK_5: control_tasca = 5; break;
 		case SDLK_6: control_tasca = 6; break;

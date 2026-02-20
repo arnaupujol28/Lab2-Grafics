@@ -44,8 +44,8 @@ public:
 	Shader* shader_ex1;
 	int control_tasca = 1;
 	char control_subtasca = 'a';
-	Texture fruits;
-
+	Texture* fruits;
+	Texture* messi;
 	void Init(void);
 	void Render(void);
 	void Update(float dt);

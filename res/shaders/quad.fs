@@ -1,6 +1,8 @@
 varying vec2 v_uv;
 uniform int u_tasca;
 uniform int u_subtasca;
+uniform sampler2D u_texture;
+uniform float u_time;
 void main()
 {	gl_FragColor=vec4(0.0,0.0,0.0,1.0); //sino entra al if pinta negre
 	
@@ -72,5 +74,45 @@ void main()
 
 		
 	}
-	
+	if(u_tasca==2){
+		vec4 texColor=texture2D(u_texture,v_uv);
+		if(u_subtasca==0){ //quan apretem a
+			float gray=(texColor.r+texColor.g+texColor.b)/3.0;
+			gl_FragColor = vec4(vec3(gray), 1.0);
+		}else if(u_subtasca==1){//quan apretem b
+			gl_FragColor = vec4(1.0 - texColor.rgb, 1.0); //restem 1 als canals RGB per poder obtenir el color oposat
+		}else if(u_subtasca==5){//quan apretem f
+			vec2 texelSize=vec2(1.0/1280.0,1.0/720.0);//perq sabem que la nostra imatge te dimension 1280x720 calculem quan medeix exacatement un pixel
+			vec4 sum=vec4(0.0);
+			for (int x = -3; x <= 3; x++) {
+            			for (int y = -3; y <= 3; y++) {
+                			vec2 offset = vec2(float(x), float(y)) * texelSize;
+                			sum += texture2D(u_texture, v_uv + offset);
+            			}
+        		}
+			gl_FragColor=sum/49.0;// dividim la suma entre el numero de mostres	
+		}
+		else{
+			gl_FragColor = texColor;	
+		}	
+
+	}
+	if(u_tasca==3){
+		if(u_subtasca==0){//quan apreto a
+			float angle = u_time * 2.0; //multipliquem per 2 perq giri més rapid
+			float s = sin(angle);
+			float c = cos(angle);
+			
+			vec2 uv = v_uv - vec2(0.5, 0.5);//movem el punt origen al centre de la textura
+			//apliquem formila trigonometrica per girar
+			vec2 uv_rotada = vec2(
+				uv.x * c - uv.y * s,
+				uv.x * s + uv.y * c
+			);
+			uv_rotada = uv_rotada + vec2(0.5, 0.5);//tornem a posar la imatge a la seva posició original
+			gl_FragColor = texture2D(u_texture, uv_rotada);//dibuicem la textura amb les noves coordenades
+		}else{
+			gl_FragColor = texture2D(u_texture, v_uv);
+		}
+	}
 }
