@@ -26,10 +26,9 @@ void main()
             		vec4 blau= vec4(0.0, 0.0, barraHoritzontal, 1.0);
             		gl_FragColor = vec4(barraVertical,0.0,barraHoritzontal,1.0);
 		}else if (u_subtasca == 3){
-    			vec2 uv = v_uv;          // IMPORTANT: declarar uv
     			float N = 16.0;          // nombre de divisions (graella)
     			// quantització a graella
-    			vec2 uv_q = floor(uv * N) / (N - 1.0);
+    			vec2 uv_q = floor(v_uv * N) / (N - 1.0);
     			gl_FragColor = vec4(uv_q.x, uv_q.y, 0.0, 1.0);
 			
 		}else if (u_subtasca == 4){
@@ -60,12 +59,13 @@ void main()
     			float g_above = (1.0 - uv.y);
 
     			//Selecció
-    			// s = 1 si uv.y >= y_curve, 0 altrament
+    			// s = 1 estem sobre la corba , 0 altrament
     			float s = step(y_curve, uv.y);
 
-    			// 4)si a dalt g_above, si a baix g_below
+    			//si a dalt g_above, si a baix g_below
     			float g = mix(g_below, g_above, s);
 
+			// per que s'assembli més a l'exemple
     			g = clamp(g, 0.0, 1.0); //limitar valor
     			g = pow(g, 2.0); // contrast
 
@@ -76,12 +76,32 @@ void main()
 	}
 	if(u_tasca==2){
 		vec4 texColor=texture2D(u_texture,v_uv);
-		if(u_subtasca==0){ //quan apretem a
+
+		if(u_subtasca==0){ //quan apretem a. escala de grisos r+g+b / 3
 			float gray=(texColor.r+texColor.g+texColor.b)/3.0;
 			gl_FragColor = vec4(vec3(gray), 1.0);
-		}else if(u_subtasca==1){//quan apretem b
+		
+		}else if(u_subtasca==1){//quan apretem b, negatiu 1 - rgb
 			gl_FragColor = vec4(1.0 - texColor.rgb, 1.0); //restem 1 als canals RGB per poder obtenir el color oposat
-		}else if(u_subtasca==5){//quan apretem f
+		
+		}else if(u_subtasca==2){//quan apretem c, groc = (1,1,0) passem la intensitat del pixel en quantitat de groc(vermell i verd)
+			float gray=(texColor.r+texColor.g+texColor.b)/3.0;
+			gl_FragColor = vec4(gray, gray, 0.0, 1.0);
+			
+
+		}else if(u_subtasca==3){//quan apretem d
+			float gray=(texColor.r+texColor.g+texColor.b)/3.0;
+			float s = step(0.5, gray); // si 0.5 > gray  , estem mes aprop del negre s = 0.0
+			gl_FragColor = vec4(s,s,s,1.0);
+
+		}else if(u_subtasca==4){//quan apretem e
+			vec2 c = vec2(0.5, 0.5);
+			float d = distance(v_uv, c);
+			vec3 black = vec3(0.0, 0.0, 0.0);
+			gl_FragColor = vec4(mix(texColor.rgb, black, d),1.0);
+			
+		
+		}else if(u_subtasca==5){//quan apretem f, box blur 7x7 fa mitjana de la caixa 7x7 de la qual es el centre
 			vec2 texelSize=vec2(1.0/1280.0,1.0/720.0);//perq sabem que la nostra imatge te dimension 1280x720 calculem quan medeix exacatement un pixel
 			vec4 sum=vec4(0.0);
 			for (int x = -3; x <= 3; x++) {
@@ -111,6 +131,14 @@ void main()
 			);
 			uv_rotada = uv_rotada + vec2(0.5, 0.5);//tornem a posar la imatge a la seva posició original
 			gl_FragColor = texture2D(u_texture, uv_rotada);//dibuicem la textura amb les noves coordenades
+
+		}else if(u_subtasca==1){//quan apreto b
+			float n = 20.0 + 15.0* sin(u_time);
+			vec2 uv = floor(v_uv*n)/n;
+			vec4 texColor=texture2D(u_texture,uv);
+			gl_FragColor = texColor;				
+ 
+		
 		}else{
 			gl_FragColor = texture2D(u_texture, v_uv);
 		}
