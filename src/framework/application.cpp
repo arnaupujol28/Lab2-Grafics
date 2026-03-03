@@ -4,6 +4,7 @@
 #include "utils.h" 
 #include "entity.h"
 #include "camera.h"
+#include "framework.h"
 
 Application::Application(const char* caption, int width, int height)
 {
@@ -34,32 +35,75 @@ void Application::Init(void)
 	std::cout << "Initiating app..." << std::endl;
 	quad_mesh = new Mesh();
 	quad_mesh->CreateQuad();
+	mesh = new Mesh();
+	mesh->LoadOBJ("meshes/lee.obj");
 
 	shader_ex1 = new Shader();
 	shader_ex1->Load("shaders/quad.vs", "shaders/quad.fs");
 
+	shader_ex2 = new Shader();
+	shader_ex2->Load("shaders/raster.vs", "shaders/raster.fs");
+
 	fruits = Texture::Get("images/fruits.png"); //carreguem la textura
 	messi = Texture::Get("images/messi.png");
+	persona = Texture::Get("textures/lee_color_specular.tga");
+
+	entity = new Entity();
+	entity->mesh = mesh;
+	entity->shader = shader_ex2;
+	entity->texture = persona;
+	entity->model.SetIdentity();
+	
+	camera = new Camera();
+	camera->SetPerspective(60.0f, window_width / float(window_height), 0.1f, 1000.0f);
+	camera->LookAt(Vector3(0, 0, 300), Vector3(0, 50, 0), Vector3(0, 1, 0));
+
+	glEnable(GL_DEPTH_TEST);
 }
 
 // Render one frame
 void Application::Render(void)
 {
+	//std::cout << control_tasca << std::endl;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //netegem pantalla i buffer
 	// ...
 
-	shader_ex1->Enable();
-	shader_ex1->SetUniform1("u_tasca", control_tasca);
-	shader_ex1->SetUniform1("u_subtasca", (int)(control_subtasca - 'a'));//passe, submtasca com un enter
-	shader_ex1->SetUniform1("u_time", this->time);
-	if (control_tasca == 2 && fruits != nullptr) {
+	if (control_tasca == 1)
+	{
+		shader_ex1->Enable();
+
+		shader_ex1->SetUniform1("u_tasca", 1);
+		shader_ex1->SetUniform1("u_subtasca", (int)(control_subtasca - 'a'));
+		shader_ex1->SetUniform1("u_time", this->time);
+
+		quad_mesh->Render();
+
+		shader_ex1->Disable();
+	}
+	else if (control_tasca == 2 && fruits != nullptr) {
+		shader_ex1->Enable();
+		shader_ex1->SetUniform1("u_tasca", control_tasca);
+		shader_ex1->SetUniform1("u_subtasca", (int)(control_subtasca - 'a'));//passe, submtasca com un enter
+		shader_ex1->SetUniform1("u_time", this->time);
 		shader_ex1->SetTexture("u_texture", fruits);
+		quad_mesh->Render();
+		shader_ex1->Disable();
 	}
 	else if (control_tasca == 3 && messi != nullptr) {
+		shader_ex1->Enable();
+		shader_ex1->SetUniform1("u_tasca", control_tasca);
+		shader_ex1->SetUniform1("u_subtasca", (int)(control_subtasca - 'a'));//passe, submtasca com un enter
+		shader_ex1->SetUniform1("u_time", this->time);
 		shader_ex1->SetTexture("u_texture", messi);
+		quad_mesh->Render();
+		shader_ex1->Disable();
 	}
-	quad_mesh->Render();
-	shader_ex1->Disable();
+	else if (control_tasca == 4) {
+
+		entity->Render(camera);
+		
+	}
+	
 
 }
 
@@ -83,7 +127,7 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
 		case SDLK_3: control_tasca = 3; 
 			control_subtasca = 'z';
 			break;
-		case SDLK_4: control_tasca = 4; break;
+		case SDLK_4: control_tasca = 4; break;// canviar
 		case SDLK_5: control_tasca = 5; break;
 		case SDLK_6: control_tasca = 6; break;
 

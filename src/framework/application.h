@@ -41,11 +41,18 @@ public:
 	Application(const char* caption, int width, int height);
 	~Application();
 	Mesh* quad_mesh;
+	Mesh* mesh;
+
+	Entity* entity = nullptr; //!!
+	Camera* camera = nullptr;  
+
 	Shader* shader_ex1;
+	Shader* shader_ex2;
 	int control_tasca = 1;
 	char control_subtasca = 'a';
 	Texture* fruits;
 	Texture* messi;
+	Texture* persona;
 	void Init(void);
 	void Render(void);
 	void Update(float dt);

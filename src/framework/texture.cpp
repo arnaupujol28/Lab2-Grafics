@@ -68,6 +68,7 @@ void Texture::Upload(unsigned int format, unsigned int type, bool mipmaps, Uint8
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT);
 
+
 	if (data && this->mipmaps)
 		GenerateMipmaps();
 

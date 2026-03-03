@@ -128,9 +128,14 @@ void main()
 			vec2 uv_rotada = vec2(
 				uv.x * c - uv.y * s,
 				uv.x * s + uv.y * c
-			);
-			uv_rotada = uv_rotada + vec2(0.5, 0.5);//tornem a posar la imatge a la seva posició original
-			gl_FragColor = texture2D(u_texture, uv_rotada);//dibuicem la textura amb les noves coordenades
+			) +vec2(0.5);
+			// aquest if cal per fer-ho més elegant pero si s'elimina i es descomenta lo d'abaix tambe funciona
+			if (uv_rotada.x < 0.0 || uv_rotada.x > 1.0 || uv_rotada.y < 0.0 || uv_rotada.y > 1.0)
+    				gl_FragColor = vec4(1.0);     
+			else
+    			gl_FragColor = texture2D(u_texture, uv_rotada);
+			//uv_rotada = uv_rotada + vec2(0.5, 0.5);//tornem a posar la imatge a la seva posició original
+			//gl_FragColor = texture2D(u_texture, uv_rotada);//dibuicem la textura amb les noves coordenades
 
 		}else if(u_subtasca==1){//quan apreto b
 			float n = 20.0 + 15.0* sin(u_time);
