@@ -67,7 +67,6 @@ void main()
 
 			// per que s'assembli més a l'exemple
     			g = clamp(g, 0.0, 1.0); //limitar valor
-    			g = pow(g, 2.0); // contrast
 
     			gl_FragColor = vec4(0.0, g, 0.0, 1.0);
 		}
