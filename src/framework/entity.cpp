@@ -50,12 +50,14 @@ void Entity::Render(Camera* camera)
     //prepara les matrius
     Matrix44 model = this->model;
     Matrix44 viewprojection = camera->GetViewProjectionMatrix();
+
+    Matrix44 test_M;test_M.SetIdentity();
     // envia les matrius
-    shader->SetMatrix44("u_model", model);
+    shader->SetMatrix44("u_model", test_M);
     shader->SetMatrix44("u_viewprojection", viewprojection);
     shader->SetTexture("u_texture", texture);
 
-    mesh->Render(GL_TRIANGLES); // dibuixa la mesh a base de triangles
+    mesh->Render(); // dibuixa la mesh a base de triangles
 
     shader->Disable();
 }

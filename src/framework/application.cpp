@@ -32,7 +32,6 @@ Application::~Application()
 void Application::Init(void)
 {
 	std::cout << "Initiating app..." << std::endl;
-	std::cout << "Initiating app..." << std::endl;
 	quad_mesh = new Mesh();
 	quad_mesh->CreateQuad();
 	//mesh 2.5
@@ -57,8 +56,8 @@ void Application::Init(void)
 	entity->model.SetIdentity();
 	// preparar la camara per veure 3D
 	camera = new Camera();
-	camera->SetPerspective(60.0f, window_width / float(window_height), 0.1f, 1000.0f);
-	camera->LookAt(Vector3(0, 0, 300), Vector3(0, 50, 0), Vector3(0, 1, 0));
+	camera->SetPerspective(60.0f, window_width / float(window_height), 0.001f, 100.0f);
+	camera->LookAt(Vector3(0, 0, 1), Vector3(0, 0, 0), Vector3(0, 1, 0));
 
 	glEnable(GL_DEPTH_TEST);
 }

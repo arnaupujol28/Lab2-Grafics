@@ -91,31 +91,31 @@ void Camera::UpdateViewMatrix()// R eix x de la camara. Forward direccio on mira
 	view_matrix.SetIdentity();
 
 	// Comment this line to create your own projection matrix!
-	//SetExampleViewMatrix();
+	SetExampleViewMatrix();
 
-	view_matrix.SetIdentity();
+	//view_matrix.SetIdentity();
 
-	Vector3 F = center - eye;   // el vector forward(vector de la camara al punt on mira) es el centre(punt on mira) - eye(punt en el que esta) 
-	F.Normalize();
+	//Vector3 F = center - eye;   // el vector forward(vector de la camara al punt on mira) es el centre(punt on mira) - eye(punt en el que esta) 
+	//F.Normalize();
 
-	Vector3 R = F.Cross(this->up);    // perpendicular al forward i al up de la camara
-	R.Normalize();
+	//Vector3 R = F.Cross(this->up);    // perpendicular al forward i al up de la camara
+	//R.Normalize();
 
-	Vector3 U = R.Cross(F);     // up corregit = R X U
+	//Vector3 U = R.Cross(F);     // up corregit = R X U
 
-	// Remember how to fill a Matrix4x4 (check framework slides)
-	// Careful with the order of matrix multiplications, and be sure to use normalized vectors!
-	
-	//omplim la matriu de vista
-	view_matrix.M[0][0] = R.x;  view_matrix.M[0][1] = U.x;  view_matrix.M[0][2] = -F.x;
-	view_matrix.M[1][0] = R.y;  view_matrix.M[1][1] = U.y;  view_matrix.M[1][2] = -F.y;
-	view_matrix.M[2][0] = R.z;  view_matrix.M[2][1] = U.z;  view_matrix.M[2][2] = -F.z;
+	//// Remember how to fill a Matrix4x4 (check framework slides)
+	//// Careful with the order of matrix multiplications, and be sure to use normalized vectors!
+	//
+	////omplim la matriu de vista
+	//view_matrix.M[0][0] = R.x;  view_matrix.M[0][1] = U.x;  view_matrix.M[0][2] = -F.x;
+	//view_matrix.M[1][0] = R.y;  view_matrix.M[1][1] = U.y;  view_matrix.M[1][2] = -F.y;
+	//view_matrix.M[2][0] = R.z;  view_matrix.M[2][1] = U.z;  view_matrix.M[2][2] = -F.z;
 
-	//part de translacio
-	view_matrix.M[0][3] = -R.Dot(eye);
-	view_matrix.M[1][3] = -U.Dot(eye);
-	view_matrix.M[2][3] = F.Dot(eye);
-	view_matrix.M[3][3] = 1.0f;
+	////part de translacio
+	//view_matrix.M[0][3] = -R.Dot(eye);
+	//view_matrix.M[1][3] = -U.Dot(eye);
+	//view_matrix.M[2][3] = F.Dot(eye);
+	//view_matrix.M[3][3] = 1.0f;
 	UpdateViewProjectionMatrix();
 }
 
@@ -126,45 +126,45 @@ void Camera::UpdateProjectionMatrix()
 	projection_matrix.SetIdentity();
 
 	// Comment this line to create your own projection matrix!
-	//SetExampleProjectionMatrix();
+	SetExampleProjectionMatrix();
 
 	// Remember how to fill a Matrix4x4 (check framework slides)
 	
-	if (type == PERSPECTIVE) {
-		
-		float f = 1.0f / tanf(fov * 0.5f); // fov en radians
-		float n = near_plane;
-		float fa = far_plane;
+	//if (type == PERSPECTIVE) {
+	//	
+	//	float f = 1.0f / tanf(fov * 0.5f); // fov en radians
+	//	float n = near_plane;
+	//	float fa = far_plane;
 
-		projection_matrix.Clear();//tot a 0 per claredat
+	//	projection_matrix.Clear();//tot a 0 per claredat
 
-		//pg 27 presentacio
-		projection_matrix.M[0][0] = f / aspect; // aspect = w/h
-		projection_matrix.M[1][1] = f;
+	//	//pg 27 presentacio
+	//	projection_matrix.M[0][0] = f / aspect; // aspect = w/h
+	//	projection_matrix.M[1][1] = f;
 
-		projection_matrix.M[2][2] = (fa + n) / (n - fa);
-		projection_matrix.M[3][2] = (2.0f * fa * n) / (n - fa);
+	//	projection_matrix.M[2][2] = (fa + n) / (n - fa);
+	//	projection_matrix.M[3][2] = (2.0f * fa * n) / (n - fa);
 
-		projection_matrix.M[2][3] = -1.0f;
-		projection_matrix.M[3][3] = 0.0f;
-	}
-	else if (type == ORTHOGRAPHIC) {
-		// ...
-		float l = left, r = right, t = top, b = bottom;
-		float n = near_plane, fa = far_plane;
+	//	projection_matrix.M[2][3] = -1.0f;
+	//	projection_matrix.M[3][3] = 0.0f;
+	//}
+	//else if (type == ORTHOGRAPHIC) {
+	//	// ...
+	//	float l = left, r = right, t = top, b = bottom;
+	//	float n = near_plane, fa = far_plane;
 
-		projection_matrix.Clear();
+	//	projection_matrix.Clear();
 
-		//pg 25
-		projection_matrix.M[0][0] = 2.0f / (r - l);
-		projection_matrix.M[1][1] = 2.0f / (t - b);
-		projection_matrix.M[2][2] = -2.0f / (fa - n);
-		projection_matrix.M[3][3] = 1.0f;
+	//	//pg 25
+	//	projection_matrix.M[0][0] = 2.0f / (r - l);
+	//	projection_matrix.M[1][1] = 2.0f / (t - b);
+	//	projection_matrix.M[2][2] = -2.0f / (fa - n);
+	//	projection_matrix.M[3][3] = 1.0f;
 
-		projection_matrix.M[3][0] = -(r + l) / (r - l);
-		projection_matrix.M[3][1] = -(t + b) / (t - b);
-		projection_matrix.M[3][2] = -(fa + n) / (fa - n);
-	} 
+	//	projection_matrix.M[3][0] = -(r + l) / (r - l);
+	//	projection_matrix.M[3][1] = -(t + b) / (t - b);
+	//	projection_matrix.M[3][2] = -(fa + n) / (fa - n);
+	//} 
 
 	UpdateViewProjectionMatrix();
 }
