@@ -5,6 +5,8 @@
 #include "mesh.h"
 #include "image.h"
 #include "shader.h"
+#include "material.h"
+
 class Image;
 class Camera;
 class Mesh;
@@ -24,6 +26,7 @@ class Entity {
 	Matrix44 model; //defineix la posició, orientació i tamany del objecte en el mon
 	Texture* texture; // he canviat Image* per Texture*
 	Shader* shader;
+	Material material;
 	int type; // hi ha tres tipus d'animacions
 };
 
