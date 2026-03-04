@@ -1,5 +1,5 @@
 // This variables comes from the vertex shader
-varying vec2 v_uv;
+varying vec2 v_uv; // ja interpolat per la gpu, no s'ha de programar
 // They are baricentric interpolated by pixel according to the distance to every vertex
 uniform sampler2D u_texture;
 

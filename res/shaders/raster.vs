@@ -11,8 +11,9 @@ varying vec2 v_uv;
 
 void main()
 {	
-	v_uv = gl_MultiTexCoord0.xy;
+	v_uv = gl_MultiTexCoord0.xy; // agafa coordenades de textura
 
+	//projecta el vertex a la pantalla
 	// Project the vertex using the model view projection matrix
 	vec4 world_position = u_model * vec4(gl_Vertex.xyz, 1.0);
 	gl_Position = u_viewprojection * world_position; //output of the vertex shader

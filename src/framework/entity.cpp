@@ -46,15 +46,16 @@ void Entity::Update(float seconds_elapsed) { // haura de ser cirdada per render 
 
 void Entity::Render(Camera* camera) 
 {
-    shader->Enable();
+    shader->Enable(); // s'utilitzara raster.vs i fs per dibuixar
+    //prepara les matrius
     Matrix44 model = this->model;
     Matrix44 viewprojection = camera->GetViewProjectionMatrix();
-    
+    // envia les matrius
     shader->SetMatrix44("u_model", model);
     shader->SetMatrix44("u_viewprojection", viewprojection);
     shader->SetTexture("u_texture", texture);
 
-    mesh->Render(GL_TRIANGLES);
+    mesh->Render(GL_TRIANGLES); // dibuixa la mesh a base de triangles
 
     shader->Disable();
 }

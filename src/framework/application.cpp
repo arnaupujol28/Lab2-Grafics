@@ -35,25 +35,27 @@ void Application::Init(void)
 	std::cout << "Initiating app..." << std::endl;
 	quad_mesh = new Mesh();
 	quad_mesh->CreateQuad();
+	//mesh 2.5
 	mesh = new Mesh();
 	mesh->LoadOBJ("meshes/lee.obj");
 
 	shader_ex1 = new Shader();
 	shader_ex1->Load("shaders/quad.vs", "shaders/quad.fs");
-
+	//shader del 2.5
 	shader_ex2 = new Shader();
 	shader_ex2->Load("shaders/raster.vs", "shaders/raster.fs");
 
 	fruits = Texture::Get("images/fruits.png"); //carreguem la textura
 	messi = Texture::Get("images/messi.png");
+	//carregar textura 2.5
 	persona = Texture::Get("textures/lee_color_specular.tga");
-
+	// posar tot el del 2.5 en una entity
 	entity = new Entity();
 	entity->mesh = mesh;
 	entity->shader = shader_ex2;
 	entity->texture = persona;
 	entity->model.SetIdentity();
-	
+	// preparar la camara per veure 3D
 	camera = new Camera();
 	camera->SetPerspective(60.0f, window_width / float(window_height), 0.1f, 1000.0f);
 	camera->LookAt(Vector3(0, 0, 300), Vector3(0, 50, 0), Vector3(0, 1, 0));
@@ -100,7 +102,7 @@ void Application::Render(void)
 	}
 	else if (control_tasca == 4) {
 
-		entity->Render(camera);
+		entity->Render(camera); // cridem el render d'entity que fa servir els shaders
 		
 	}
 	
