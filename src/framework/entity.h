@@ -29,5 +29,5 @@ class Entity {
 	Material material;
 	int type; // hi ha tres tipus d'animacions
 };
-
-#endif // !ENTITY_H
+#endif 
+// !ENTITY_H

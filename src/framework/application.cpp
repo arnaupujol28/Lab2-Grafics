@@ -59,7 +59,7 @@ void Application::Init(void)
 	camera->SetPerspective(60.0f, window_width / float(window_height), 0.001f, 100.0f);
 	camera->LookAt(Vector3(0, 0, 1), Vector3(0, 0, 0), Vector3(0, 1, 0));
 
-	glEnable(GL_DEPTH_TEST);
+	
 }
 
 // Render one frame
@@ -100,9 +100,29 @@ void Application::Render(void)
 		shader_ex1->Disable();
 	}
 	else if (control_tasca == 4) {
+		if (control_subtasca == 'a') {
+			glDisable(GL_DEPTH_TEST);
+			shader_ex1->Enable();
+			shader_ex1->SetUniform1("u_tasca", 3);
+			shader_ex1->SetUniform1("u_subtasca", 0);
+			shader_ex1->SetUniform1("u_time", 0.0f);
 
-		entity->Render(camera); // cridem el render d'entity que fa servir els shaders
-		
+			if (persona != nullptr) {
+				shader_ex1->SetTexture("u_texture", persona);
+			}
+			quad_mesh->Render();
+			shader_ex1->Disable();
+		}
+		else if (control_subtasca == 'b') {
+
+			// Activam el z-buffer
+			glEnable(GL_DEPTH_TEST);
+
+			entity->Render(camera);
+
+			glDisable(GL_DEPTH_TEST);
+		}
+
 	}
 	
 
@@ -139,6 +159,9 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
 		case SDLK_d: control_subtasca = 'd'; break;
 		case SDLK_e: control_subtasca = 'e'; break;
 		case SDLK_f: control_subtasca = 'f'; break;
+		case SDLK_l:
+			std::cout << "Canviant escenes del lab 4/lab 5.." << std::endl;
+			break;
 	}
 }
 
