@@ -9,7 +9,7 @@ void Material::Enable()
     }
 
     shader->Enable();
-.
+
     //els noms han de coincidir amb els del shader
     shader->SetUniform4("u_material_color", base.r, base.g, base.b, 1.0);
     shader->SetUniform1("u_material_shininess", shininess);
