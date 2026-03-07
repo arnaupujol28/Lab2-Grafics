@@ -46,9 +46,9 @@ void Entity::Update(float seconds_elapsed) { // haura de ser cirdada per render 
 
 void Entity::Render(sUniformData& uniformData)
 {
-    uniformData.model = this->model;
-    material.Enable(uniformData);
-    if (mesh != nullptr) {
+    uniformData.model = this->model; // actualitzar model
+    material.Enable(uniformData); // activar material amb l'uniform data de application
+    if (mesh != nullptr) { // pintar mesh
         mesh->Render();
     }
     material.Disable();

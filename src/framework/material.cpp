@@ -1,8 +1,8 @@
 #include "material.h"
 #include <iostream>
 
-//prova
-void Material::Enable(const sUniformData& uniformData)
+//prova 
+void Material::Enable(const sUniformData& uniformData) // activar el shader
 {
     if (!shader) {
         return;
@@ -30,7 +30,7 @@ void Material::Enable(const sUniformData& uniformData)
     shader->SetVector3("u_light_color", uniformData.light.color);
 }
 
-void Material::Disable()
+void Material::Disable() // desactivar el shader
 {
     if (!shader) return;
     shader->Disable();

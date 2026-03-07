@@ -32,31 +32,48 @@ Application::~Application()
 void Application::Init(void)
 {
 	std::cout << "Initiating app..." << std::endl;
+
+	//Crear recursos
+
+	//quad mesh
 	quad_mesh = new Mesh();
 	quad_mesh->CreateQuad();
 	//mesh 2.5
 	mesh = new Mesh();
 	mesh->LoadOBJ("meshes/lee.obj");
 
+	//shader de formules, fruites i messi
 	shader_ex1 = new Shader();
 	shader_ex1->Load("shaders/quad.vs", "shaders/quad.fs");
 	//shader del 2.5
 	shader_ex2 = new Shader();
 	shader_ex2->Load("shaders/raster.vs", "shaders/raster.fs");
 
-	fruits = Texture::Get("images/fruits.png"); //carreguem la textura
+	//carreguem la textura
+	fruits = Texture::Get("images/fruits.png"); 
 	messi = Texture::Get("images/messi.png");
 	//carregar textura 2.5
 	persona = Texture::Get("textures/lee_color_specular.tga");
+	
 	// posar tot el del 2.5 en una entity
 	entity = new Entity();
 	entity->mesh = mesh;
-	entity->model.SetIdentity();
 	entity->shader = shader_ex2;
 	entity->texture = persona;
 	entity->model.SetIdentity();
-	entity->material.shader = shader_ex2;
-	entity->material.color_texture = persona;
+	entity->material.shader = shader_ex2; // assignar el shader del material
+	entity->material.color_texture = persona; // assignar la textura del material
+	entities.push_back(entity); // afegir entities al final del vector
+	
+	//llum ambient
+	ambient_intensity = 0.1f;
+
+	// crear llum
+	sLight light;
+	light.position = Vector3(10.0f, 20.0f, 20.0f); // a dalt a la dreta
+	light.color = Vector3(1.0f, 1.0f, 1.0f);       // llum blanca
+	lights.push_back(light);
+
 	// preparar la camara per veure 3D
 	camera = new Camera();
 	camera->SetPerspective(60.0f, window_width / float(window_height), 0.001f, 100.0f);
@@ -123,14 +140,12 @@ void Application::Render(void)
 			//configurem camara
 
 			camera->SetPerspective(60.0f, window_width / float(window_height), 0.1f, 1000.0f);
-			//omplim tuberia de dades
+			//omplim tuberia de dades. info de la camera
 			uniform_data.viewprojection = camera->viewprojection_matrix;
 			uniform_data.camera_position = camera->eye;
-			uniform_data.ambient_light = Vector3(0.1f, 0.1f, 0.1f);
-			//primera llum
-			uniform_data.light.position = Vector3(10.0f, 20.0f, 20.0f); // Luz arriba a la derecha
-			uniform_data.light.color = Vector3(1.0f, 1.0f, 1.0f);
+			uniform_data.ambient_light = Vector3(ambient_intensity, ambient_intensity, ambient_intensity);
 
+			uniform_data.light = lights[0];
 			entity->Render(uniform_data);
 
 			glDisable(GL_DEPTH_TEST);

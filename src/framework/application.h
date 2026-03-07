@@ -10,6 +10,7 @@
 #include "mesh.h" 
 #include "shader.h" 
 #include "texture.h"
+#include "material.h"
 class Application
 {
 public:
@@ -43,7 +44,7 @@ public:
 	Mesh* quad_mesh;
 	Mesh* mesh;
 
-	Entity* entity = nullptr; //!!
+	Entity* entity = nullptr;
 	Camera* camera = nullptr;  
 	sUniformData uniform_data;
 	Shader* shader_ex1;
@@ -56,6 +57,11 @@ public:
 	void Init(void);
 	void Render(void);
 	void Update(float dt);
+
+	std::vector<Entity*> entities;
+	std::vector<sLight> lights;
+	float ambient_intensity;
+
 
 	// Other methods to control the app
 	void SetWindowSize(int width, int height) {
