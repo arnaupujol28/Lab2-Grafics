@@ -2,7 +2,7 @@
 #include <iostream>
 
 //prova
-void Material::Enable()
+void Material::Enable(const sUniformData& uniformData)
 {
     if (!shader) {
         return;
@@ -19,6 +19,15 @@ void Material::Enable()
 
     if (normal_texture)
         shader->SetTexture("u_normal_texture", normal_texture);
+
+    shader->SetMatrix44("u_model", uniformData.model);
+    shader->SetMatrix44("u_viewprojection", uniformData.viewprojection);
+    shader->SetVector3("u_camera_position", uniformData.camera_position);
+    shader->SetVector3("u_ambient_light", uniformData.ambient_light);
+
+    //enviem les dades de la llum
+    shader->SetVector3("u_light_position", uniformData.light.position);
+    shader->SetVector3("u_light_color", uniformData.light.color);
 }
 
 void Material::Disable()

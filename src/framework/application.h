@@ -45,7 +45,7 @@ public:
 
 	Entity* entity = nullptr; //!!
 	Camera* camera = nullptr;  
-
+	sUniformData uniform_data;
 	Shader* shader_ex1;
 	Shader* shader_ex2;
 	int control_tasca = 1;

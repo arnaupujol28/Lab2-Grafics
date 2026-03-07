@@ -44,22 +44,14 @@ void Entity::Update(float seconds_elapsed) { // haura de ser cirdada per render 
 
 }
 
-void Entity::Render(Camera* camera) 
+void Entity::Render(sUniformData& uniformData)
 {
-    shader->Enable(); // s'utilitzara raster.vs i fs per dibuixar
-    //prepara les matrius
-    Matrix44 model = this->model;
-    Matrix44 viewprojection = camera->GetViewProjectionMatrix();
-
-    Matrix44 test_M;test_M.SetIdentity();
-    // envia les matrius
-    shader->SetMatrix44("u_model", test_M);
-    shader->SetMatrix44("u_viewprojection", viewprojection);
-    shader->SetTexture("u_texture", texture);
-
-    mesh->Render(); // dibuixa la mesh a base de triangles
-
-    shader->Disable();
+    uniformData.model = this->model;
+    material.Enable(uniformData);
+    if (mesh != nullptr) {
+        mesh->Render();
+    }
+    material.Disable();
 }
     
 

@@ -51,9 +51,12 @@ void Application::Init(void)
 	// posar tot el del 2.5 en una entity
 	entity = new Entity();
 	entity->mesh = mesh;
+	entity->model.SetIdentity();
 	entity->shader = shader_ex2;
 	entity->texture = persona;
 	entity->model.SetIdentity();
+	entity->material.shader = shader_ex2;
+	entity->material.color_texture = persona;
 	// preparar la camara per veure 3D
 	camera = new Camera();
 	camera->SetPerspective(60.0f, window_width / float(window_height), 0.001f, 100.0f);
@@ -117,8 +120,18 @@ void Application::Render(void)
 
 			// Activam el z-buffer
 			glEnable(GL_DEPTH_TEST);
+			//configurem camara
 
-			entity->Render(camera);
+			camera->SetPerspective(60.0f, window_width / float(window_height), 0.1f, 1000.0f);
+			//omplim tuberia de dades
+			uniform_data.viewprojection = camera->viewprojection_matrix;
+			uniform_data.camera_position = camera->eye;
+			uniform_data.ambient_light = Vector3(0.1f, 0.1f, 0.1f);
+			//primera llum
+			uniform_data.light.position = Vector3(10.0f, 20.0f, 20.0f); // Luz arriba a la derecha
+			uniform_data.light.color = Vector3(1.0f, 1.0f, 1.0f);
+
+			entity->Render(uniform_data);
 
 			glDisable(GL_DEPTH_TEST);
 		}

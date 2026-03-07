@@ -7,17 +7,16 @@
 #include "shader.h"
 #include "material.h"
 
-class Image;
+
 class Camera;
 class Mesh;
-
-class FloatImage;
-
+class Texture;
+class Shader;
 class Entity {
 	
 	public:
 	Entity(); // signatura constructor
-	void Render(Camera* camera);
+	void Render(sUniformData& uniformData);
 	void Update(float seconds_elapsed);
 
 
