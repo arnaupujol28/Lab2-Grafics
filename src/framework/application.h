@@ -49,6 +49,7 @@ public:
 	sUniformData uniform_data;
 	Shader* shader_ex1;
 	Shader* shader_ex2;
+	Shader* shader_gouraud;
 	int control_tasca = 1;
 	char control_subtasca = 'a';
 	Texture* fruits;

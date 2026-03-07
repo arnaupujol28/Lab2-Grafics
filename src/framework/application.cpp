@@ -48,7 +48,8 @@ void Application::Init(void)
 	//shader del 2.5
 	shader_ex2 = new Shader();
 	shader_ex2->Load("shaders/raster.vs", "shaders/raster.fs");
-
+	shader_gouraud = new Shader();
+	shader_gouraud->Load("shaders/gouraud.vs", "shaders/gouraud.fs");
 	//carreguem la textura
 	fruits = Texture::Get("images/fruits.png"); 
 	messi = Texture::Get("images/messi.png");
@@ -176,7 +177,10 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
 		case SDLK_3: control_tasca = 3; 
 			control_subtasca = 'z';
 			break;
-		case SDLK_4: control_tasca = 4; break;// canviar
+		case SDLK_4: 
+			control_tasca = 4; 
+			entity->material.shader = shader_ex2;
+			break;// canviar
 		case SDLK_5: control_tasca = 5; break;
 		case SDLK_6: control_tasca = 6; break;
 
@@ -189,6 +193,17 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
 		case SDLK_f: control_subtasca = 'f'; break;
 		case SDLK_l:
 			std::cout << "Canviant escenes del lab 4/lab 5.." << std::endl;
+			if (entity->material.shader == shader_ex2) {//si entiti te lab 4 el posem a lab 5
+				entity->material.shader = shader_gouraud;
+			}
+			// Si te el de lab 5 el posem al 4
+			else {
+				entity->material.shader = shader_ex2;
+			}
+			break;
+		case SDLK_g:
+			entity->material.shader = shader_gouraud;
+			std::cout << "Mode: Gouraud Shading activat" << std::endl;
 			break;
 	}
 }
