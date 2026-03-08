@@ -48,22 +48,29 @@ void Application::Init(void)
 	//shader del 2.5
 	shader_ex2 = new Shader();
 	shader_ex2->Load("shaders/raster.vs", "shaders/raster.fs");
+	//shader gouraud
 	shader_gouraud = new Shader();
 	shader_gouraud->Load("shaders/gouraud.vs", "shaders/gouraud.fs");
+	//shader phong
+	shader_phong = new Shader();
+	shader_phong->Load("shaders/phong.vs", "shaders/phong.fs");
+
 	//carreguem la textura
 	fruits = Texture::Get("images/fruits.png"); 
 	messi = Texture::Get("images/messi.png");
 	//carregar textura 2.5
 	persona = Texture::Get("textures/lee_color_specular.tga");
+	persona_normals = Texture::Get("textures/lee_normal.tga");
 	
 	// posar tot el del 2.5 en una entity
 	entity = new Entity();
 	entity->mesh = mesh;
-	entity->shader = shader_ex2;
+	entity->shader = shader_phong;
 	entity->texture = persona;
 	entity->model.SetIdentity();
-	entity->material.shader = shader_ex2; // assignar el shader del material
+	entity->material.shader = shader_phong; // assignar el shader del material
 	entity->material.color_texture = persona; // assignar la textura del material
+	entity->material.normal_texture = persona_normals;
 	entities.push_back(entity); // afegir entities al final del vector
 	
 	//llum ambient
@@ -147,6 +154,10 @@ void Application::Render(void)
 			uniform_data.ambient_light = Vector3(ambient_intensity, ambient_intensity, ambient_intensity);
 
 			uniform_data.light = lights[0];
+
+			uniform_data.use_color_texture = use_color_texture;
+			uniform_data.use_specular_texture = use_specular_texture;
+			uniform_data.use_normal_texture = use_normal_texture;
 			entity->Render(uniform_data);
 
 			glDisable(GL_DEPTH_TEST);
@@ -187,7 +198,15 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
 			// Teclas de la 'a' a la 'f' para las subtareas 
 		case SDLK_a: control_subtasca = 'a'; break;
 		case SDLK_b: control_subtasca = 'b'; break;
-		case SDLK_c: control_subtasca = 'c'; break;
+		case SDLK_c:
+			if (control_tasca == 4 && entity->material.shader == shader_phong) { // phong
+				use_color_texture = !use_color_texture;
+				std::cout << "Color texture: " << use_color_texture << std::endl;
+			}
+			else {
+				control_subtasca = 'c';
+			}
+			break;
 		case SDLK_d: control_subtasca = 'd'; break;
 		case SDLK_e: control_subtasca = 'e'; break;
 		case SDLK_f: control_subtasca = 'f'; break;
@@ -204,6 +223,25 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
 		case SDLK_g:
 			entity->material.shader = shader_gouraud;
 			std::cout << "Mode: Gouraud Shading activat" << std::endl;
+			break;
+		case SDLK_p:
+			entity->material.shader = shader_phong;
+			std::cout << "Mode: Phong Shading activat" << std::endl;
+			break;
+			//case c fet adalt
+
+		case SDLK_s:
+			if (entity->material.shader == shader_phong) {
+				use_specular_texture = !use_specular_texture;
+				std::cout << "Specular texture: " << use_specular_texture << std::endl;
+			}
+			break;
+
+		case SDLK_n:
+			if (entity->material.shader == shader_phong) {
+				use_normal_texture = !use_normal_texture;
+				std::cout << "Normal texture: " << use_normal_texture << std::endl;
+			}
 			break;
 	}
 }

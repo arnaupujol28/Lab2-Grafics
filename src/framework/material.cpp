@@ -20,6 +20,16 @@ void Material::Enable(const sUniformData& uniformData) // activar el shader
     if (normal_texture)
         shader->SetTexture("u_normal_texture", normal_texture);
 
+    if (uniformData.use_color_texture) shader->SetUniform1("u_use_color_texture",1);
+    else shader->SetUniform1("u_use_color_texture",0);
+    
+    if(uniformData.use_specular_texture) shader->SetUniform1("u_use_specular_texture",1);
+    else shader->SetUniform1("u_use_specular_texture", 0);
+
+    if(uniformData.use_normal_texture) shader->SetUniform1("u_use_normal_texture",1);
+    else shader->SetUniform1("u_use_normal_texture", 0);
+    
+
     shader->SetMatrix44("u_model", uniformData.model);
     shader->SetMatrix44("u_viewprojection", uniformData.viewprojection);
     shader->SetVector3("u_camera_position", uniformData.camera_position);

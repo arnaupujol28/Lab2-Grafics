@@ -50,11 +50,18 @@ public:
 	Shader* shader_ex1;
 	Shader* shader_ex2;
 	Shader* shader_gouraud;
+	Shader* shader_phong;
 	int control_tasca = 1;
 	char control_subtasca = 'a';
 	Texture* fruits;
 	Texture* messi;
 	Texture* persona;
+	Texture* persona_normals;
+
+	bool use_color_texture = true;
+	bool use_specular_texture = true;
+	bool use_normal_texture = true;
+
 	void Init(void);
 	void Render(void);
 	void Update(float dt);
