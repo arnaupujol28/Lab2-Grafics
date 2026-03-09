@@ -6,7 +6,7 @@
 #include "image.h"
 #include "shader.h"
 #include "material.h"
-
+#include <vector>
 
 class Camera;
 class Mesh;
@@ -16,7 +16,7 @@ class Entity {
 	
 	public:
 	Entity(); // signatura constructor
-	void Render(sUniformData& uniformData);
+	void Render(sUniformData& uniformData, const std::vector<sLight>& scene_lights, int num_lights_to_render);
 	void Update(float seconds_elapsed);
 
 

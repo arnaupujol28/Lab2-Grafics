@@ -14,9 +14,9 @@ struct sUniformData {//tuberia de dades el que viatja de la cpu a la gpu
 	Vector3 camera_position;
 	Vector3 ambient_light;
 	sLight light;
-	bool use_color_texture;
-	bool use_specular_texture;
-	bool use_normal_texture;
+	bool use_color_texture = false;
+	bool use_specular_texture = false;
+	bool use_normal_texture = false;
 };
 class Material {
 	public:

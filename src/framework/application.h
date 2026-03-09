@@ -23,6 +23,7 @@ public:
 
 	float time;
 
+	int num_lights_to_render = 1;
 	// Input
 	const Uint8* keystate;
 	int mouse_state; // Tells which buttons are pressed

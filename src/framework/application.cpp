@@ -23,6 +23,19 @@ Application::Application(const char* caption, int width, int height)
 	this->framebuffer.Resize(w, h);
 	this->fruits = nullptr;
 	this->messi = nullptr;
+
+
+	this->ambient_intensity = 0.1f;
+	this->mesh = nullptr;
+	this->quad_mesh = nullptr;
+	this->persona = nullptr;
+	this->persona_normals = nullptr;
+	this->fruits = nullptr;
+	this->messi = nullptr;
+	this->shader_ex1 = nullptr;
+	this->shader_ex2 = nullptr;
+	this->shader_gouraud = nullptr;
+	this->shader_phong = nullptr;
 }
 
 Application::~Application()
@@ -73,14 +86,19 @@ void Application::Init(void)
 	entity->material.normal_texture = persona_normals;
 	entities.push_back(entity); // afegir entities al final del vector
 	
-	//llum ambient
-	ambient_intensity = 0.1f;
+	lights.clear();
+	//llum principal blanca
+	sLight light1;
+	light1.position = Vector3(10.0f, 20.0f, 20.0f);
+	light1.color = Vector3(1.0f, 1.0f, 1.0f);
+	lights.push_back(light1);
 
-	// crear llum
-	sLight light;
-	light.position = Vector3(10.0f, 20.0f, 20.0f); // a dalt a la dreta
-	light.color = Vector3(1.0f, 1.0f, 1.0f);       // llum blanca
-	lights.push_back(light);
+	// crear llum 2
+	sLight light2;
+	light2.position = Vector3(-20.0f, 0.0f, 10.0f);
+	light2.color = Vector3(1.0f, 0.0f, 0.0f); // vermella       
+	lights.push_back(light2);
+
 
 	// preparar la camara per veure 3D
 	camera = new Camera();
@@ -153,12 +171,13 @@ void Application::Render(void)
 			uniform_data.camera_position = camera->eye;
 			uniform_data.ambient_light = Vector3(ambient_intensity, ambient_intensity, ambient_intensity);
 
-			uniform_data.light = lights[0];
-
+			// 1. PASAMOS LOS BOOLEANOS A LA TUBERÍA
 			uniform_data.use_color_texture = use_color_texture;
 			uniform_data.use_specular_texture = use_specular_texture;
 			uniform_data.use_normal_texture = use_normal_texture;
-			entity->Render(uniform_data);
+
+			// 2. HACEMOS EL RENDER DE LA ENTIDAD (CON EL MULTIPASS)
+			entity->Render(uniform_data, lights, num_lights_to_render);
 
 			glDisable(GL_DEPTH_TEST);
 		}
@@ -181,9 +200,24 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
 	switch(event.keysym.sym) {
 		case SDLK_ESCAPE: exit(0); break; // ESC key, kill the app
 		
-		case SDLK_1: control_tasca = 1; break;
-		case SDLK_2: control_tasca = 2; 
-			control_subtasca = 'z';
+		case SDLK_1:
+			if (control_tasca == 4 && control_subtasca == 'b' && entity->material.shader != shader_ex2) {
+				num_lights_to_render = 1;
+				std::cout << "1 Llum activada" << std::endl;
+			}
+			else {
+				control_tasca = 1;
+			}
+			break;
+		case SDLK_2:
+			if (control_tasca == 4 && control_subtasca == 'b' && entity->material.shader != shader_ex2) {
+				num_lights_to_render = 2;
+				std::cout << "2 Llums activades" << std::endl;
+			}
+			else {
+				control_tasca = 2;
+				control_subtasca = 'z';
+			}
 			break;
 		case SDLK_3: control_tasca = 3; 
 			control_subtasca = 'z';
